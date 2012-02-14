@@ -13,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
+import eu.scape_project.bitwiser.utils.Entropy;
+
 /**
  * Brute force bitwise analysis of transformations and analysers.
  * 
