@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.scape_project.pc.qa.bitwiser;
+package eu.scape_project.bitwiser;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;

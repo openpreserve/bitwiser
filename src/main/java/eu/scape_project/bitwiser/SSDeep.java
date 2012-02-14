@@ -40,7 +40,7 @@
   then I will probably say yes.
   
 */
-package eu.scape_project.pc.qa.bitwiser;
+package eu.scape_project.bitwiser;
 
 import java.io.File;
 import java.io.FileInputStream;
