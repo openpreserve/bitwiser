@@ -1,0 +1,370 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Automated Evaluation Of Preservation Actions Via Bitwise Process Analysis
+\end_layout
+
+\begin_layout Author
+Andrew N.
+ Jackson
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Need to QA processes and find trustworthy tools.
+\end_layout
+
+\begin_layout Standard
+However, difficult to be sure tools are good.
+\end_layout
+
+\begin_layout Standard
+In particular, coverage.
+\end_layout
+
+\begin_layout Standard
+Has all of the content been transferred.
+\end_layout
+
+\begin_layout Standard
+Typical analysis is via characterisation, or migration to a common form
+ (e.g.
+ round-trip analysis).
+\end_layout
+
+\begin_layout Standard
+However, this is not always possible due to the lack of characterisation
+ tools, and their coverage.
+\end_layout
+
+\begin_layout Standard
+XCL is extremely useful here, but requires immense work to develop.
+\end_layout
+
+\begin_layout Standard
+Also, round-trip transforms cannot always be identity transformations, need
+ some format-specific knowledge, and of course, it is difficult to tell
+ which stage lost the data without raw stuff.
+\end_layout
+
+\begin_layout Standard
+So, it would be useful to be able to analyse the coverage of single transformati
+on or even simple characterisations.
+\end_layout
+
+\begin_layout Standard
+REALLY need to be clear as to why round-trip is not a better way to spend
+ your time.
+\end_layout
+
+\begin_layout Standard
+Of course, characterisation tools do not fit into the round-trip mould.
+\end_layout
+
+\begin_layout Standard
+In particular, we might be interesting in diagnostic properties (like this
+ histogram of an image) that can be used to QA a future migration.
+ Should represent an aggregation over the whole content, and so the coverage
+ can be analysed.
+\end_layout
+
+\begin_layout Section
+Theory
+\end_layout
+
+\begin_layout Standard
+So, when parsing a file, any software must work though the contents of that
+ file, working our which are the packaging and spacers, and which is the
+ data.
+\end_layout
+
+\begin_layout Standard
+Link to Postel's Law: "be conservative in what you do, be liberal in what
+ you accept from others", outline problems with this approach.
+\end_layout
+
+\begin_layout Standard
+If we look at the Shotgun approach, we can see that there are these consequequen
+ces of flipping a bit.
+\end_layout
+
+\begin_layout Standard
+Bit modified the packaging.
+\end_layout
+
+\begin_layout Standard
+Either the bit causes the file to be unparseable, and the process halts
+ (no output).
+\end_layout
+
+\begin_layout Standard
+Or the bit modification leads to a parsing error, but the parser attempts
+ to fix it and continues (should be a warning).
+\end_layout
+
+\begin_layout Standard
+Or the bit modification leads to a new interpretation, and the process continues
+ (should change the output).
+\end_layout
+
+\begin_layout Standard
+Bit modifies a 'content' bit.
+\end_layout
+
+\begin_layout Standard
+Bit leads to an invalid content value.
+ (no output)
+\end_layout
+
+\begin_layout Standard
+Bit leads to inconsistent content that cannot be fixed.
+ (no output)
+\end_layout
+
+\begin_layout Standard
+Bit leads to inconsistent content that checksums can fix.
+ (warning)
+\end_layout
+
+\begin_layout Standard
+Bit leads to new value for content (should change the output).
+\end_layout
+
+\begin_layout Standard
+That is, if any bit is changed and yet produces an identical output file,
+ and no warning is given, then either the bit is being ignored (never used,
+ or overruled by other parts) by the process (and is not present in the
+ output) or the bit is being silently fixed (which rare, and is not good
+ practice).
+\end_layout
+
+\begin_layout Standard
+The relationship may not be trivial, as the mappings may be degenerate.
+ 0&0, 1|1, 1|0, 0|1.
+ It is possible that these bits act in combination.
+ Doesn't really make sense to me.
+ Each bit that does not affect the output is not important in the context
+ of the other bits.
+ Yes, if two 'silent' bits were changed simultanously, it may change the
+ output.
+ But that does not change what I care about.
+ Which I need to express more clearly.
+\end_layout
+
+\begin_layout Standard
+The bit that does not affect the output is surplus to requirements, as it's
+ value is irrelevant, because the other bits overrule it.
+ It's really about interpreting the analysis, I think.
+\end_layout
+
+\begin_layout Standard
+Therefore, if we go through a single file, flipping each bit in turn, then
+ we can map precisely which bits and bytes are making a difference success
+ and the output of the process.
+ Information mapping evaluated in this way.
+\end_layout
+
+\begin_layout Standard
+Does not, of course, guarentee that the interpretation was correct, or even
+ that the bit was completely transformed.
+ Fractional bit loss.
+ However, any successful migration must at least meet this criterion, and
+ round-trip analysis can be applied in cases of doubt.
+\end_layout
+
+\begin_layout Standard
+Diagnostic properties, coverage analysis is sensitive because every bit
+ should count.
+ Of course, different images may produce the same histogram, but useful
+ properties are sensitive to small changes, e.g.
+ hashes.
+\end_layout
+
+\begin_layout Standard
+Bitwiser: can circumvent checksum problem by chaining transforms.
+ Validate a uncomp to comp tiff transform, and then use that as input to
+ comp tiff to other transformation analysis.
+ 
+\end_layout
+
+\begin_layout Standard
+Round trip only applies to migration, and different encodings of the same
+ data are difficult to spot.
+ Bitwiser helps.
+\end_layout
+
+\begin_layout Standard
+Round trip combos using different tools help to assure interpretation by
+ spotting if it's consistent.
+ So kakadu up and lead tools down will reveal dpi loss that kakadu alone
+ would miss.
+\end_layout
+
+\begin_layout Standard
+Similarly, in using user simulation to validate interpretation, bitwiser
+ can test if all bits affect the user experience.
+\end_layout
+
+\begin_layout Standard
+Create damage map of PSNR in the output image as each input image bit is
+ twiddled.
+\end_layout
+
+\begin_layout Section
+Experimental Protocol
+\end_layout
+
+\begin_layout Standard
+Explain the code process, evaluation etc.
+\end_layout
+
+\begin_layout Standard
+Discuss the transformation that are analysed.
+ Uncompressed TIFF or compressed inputs.
+ Transform to lossless and lossy formats (JP2, JPEG, etc).
+\end_layout
+
+\begin_layout Standard
+Also characterisation tools.
+ File, DROID, JHOVE.
+\end_layout
+
+\begin_layout Subsection
+Metrics
+\end_layout
+
+\begin_layout Standard
+How to analyse the coverage.
+\end_layout
+
+\begin_layout Standard
+Shannon Entropy? Is that of much use here?
+\end_layout
+
+\begin_layout Standard
+There is an interesting story about how operations that increase the entropy
+ make the file more like random files.
+ Meaning that the 'meaning' moves into the environment, and the file become
+ less interpretable alone.
+ Relationship between recognisable 'meaning' and infomation entropy is curious.
+ Very low entropy is easy to understand, but carries little meaning.
+ Very high entropy is difficult to understand, but can carry a lot of meaning
+ if you know how to decode it.
+\end_layout
+
+\begin_layout Standard
+Also, block-wise complexity scanning? Useful?
+\end_layout
+
+\begin_layout Standard
+http://blog.dkbza.org/2007/05/scanning-data-for-entropy-anomalies.html
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+How well this all worked.
+\end_layout
+
+\begin_layout Section
+Conclusions
+\end_layout
+
+\begin_layout Standard
+Subtler cases require round-trip analysis?
+\end_layout
+
+\begin_layout Standard
+Re-emphasise that these ideas, and QA ideas from Becker paper, and other
+ useful concepts, do not fit into the traditional 'significant properties'
+ model as they are properties of comparison, not the comparison of properties.
+\end_layout
+
+\begin_layout Section
+Notes
+\end_layout
+
+\begin_layout Standard
+Automated tool coverage analysis via fuzzing.
+ (Anyone?) 
+\end_layout
+
+\begin_layout Standard
+The shotgun, generalised to systematic information loss examiniation.
+ 
+\end_layout
+
+\begin_layout Standard
+NOTE that by measuring the degree of difference between input and output,
+ we can also estimate the actual degree of loss even when there is a transformat
+ion of encoding.
+ complimentary to round-trip analysis, but helps to ensure analysis of the
+ single step.
+ - droid, jhove, conversion with imagemagick, helping to tweak options.
+ 
+\end_layout
+
+\begin_layout Standard
+Look at TIFF to JPEG conversion as an example of tracking data loss.
+ 
+\end_layout
+
+\begin_layout Standard
+Look for large byte mappings, contigious, or even in order, to spot simple
+ transformations (re-packaging) versus complex transforms (colourspaces,
+ v metadata).
+ 
+\end_layout
+
+\begin_layout Standard
+Automatically explore parameter spaces? 
+\end_layout
+
+\end_body
+\end_document
