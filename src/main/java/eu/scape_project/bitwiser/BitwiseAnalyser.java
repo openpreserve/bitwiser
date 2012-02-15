@@ -12,8 +12,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import eu.scape_project.bitwiser.utils.Entropy;
+import eu.scape_project.bitwiser.utils.StreamReader;
 
 /**
  * Brute force bitwise analysis of transformations and analysers.
@@ -51,18 +56,21 @@ public class BitwiseAnalyser {
         DIFFERENT,
         NONE
     }
+    
+    private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert";
+    private static final String DATA_DIR	= "C:/Projects/SCAPE/BitWiser/Data/";
 
     public static void main(String [] args) throws IOException {
-        File sourceFile = new File("/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
-        File tempFile = new File("/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
-        File outputFile = new File("/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
+        File sourceFile = new File(DATA_DIR+"02c440f.tif");		//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
+        File tempFile = new File(DATA_DIR+"02c440f.tmp.tif");	//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
+        File outputFile = new File(DATA_DIR+"02c440f.jp2");		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
         copy(sourceFile,tempFile);
         
         // Entropy Calc:
         Entropy ent = new Entropy();
         System.out.println("Starting entropy calc...");
         ent.calculate(tempFile, false, false, false, false);
-        System.exit(0);
+        //System.exit(0);
         
         // Start munging...
         System.out.println("Start bit-flipping...");
@@ -73,7 +81,12 @@ public class BitwiseAnalyser {
         int clears = 0;
         int errors = 0;
         int warnings = 0;
+        int count = 0;
+        long len = tempFile.length();
+        System.out.println("File length: "+len);
         for( long pos = 0; pos < tempFile.length(); pos++ ) {
+        	count++;
+       		System.out.println("Completed: "+(100*count/len)+"%");
             flipByteAt(rf,pos);
             result = runCommand(tempFile, outputFile);
             if( ! result.equals(truth) )
@@ -97,22 +110,44 @@ public class BitwiseAnalyser {
     static String runCommand( File tempFile, File outputFile ) throws IOException {
 //        String[] commands = new String[]{"file", tempFile.getAbsolutePath() };
         outputFile.delete();
-        String[] commands = new String[]{"convert", tempFile.getAbsolutePath(), outputFile.getAbsolutePath() };
+        String[] commands = new String[]{CMD_CONVERT, tempFile.getAbsolutePath(), outputFile.getAbsolutePath() };
                 
         ProcessBuilder pb = new ProcessBuilder(commands);
         // Do this?
         pb.redirectErrorStream(true);
         Process child = pb.start();
+        
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<String> ftr_stdout = executor.submit(new StreamReader(child.getInputStream()));
+        Future<String> ftr_stderr = executor.submit(new StreamReader(child.getErrorStream()));
+        
         try {
             child.waitFor();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } finally {
+        	// clear InterruptedException - is this still needed?
+        	Thread.interrupted();
         }
         
-        String stdout = convertStreamToString(child.getInputStream()).trim();
-        String stderr = convertStreamToString(child.getErrorStream()).trim();
+        String stdout = "";
+        String stderr = "";
+        try {
+			stdout = ftr_stdout.get();
+			stderr = ftr_stderr.get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         int exitCode = child.exitValue();
         boolean exists = outputFile.exists();
+        
+        // Shutdown the executor service so that program terminates
+        executor.shutdown();
         
         if( exists ) {
             if(exitCode != 0 || stdout.length() > 1 || stderr.length() > 1) return "WARNING:"+exitCode+":"+stdout+"::"+stderr;
@@ -135,24 +170,5 @@ public class BitwiseAnalyser {
      in.close();
      out.flush();
      out.close();
-    }
-    
-    public static String convertStreamToString(InputStream is) throws IOException {
-        if (is != null) {
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-            } finally {
-                is.close();
-            }
-            return sb.toString();
-        } else {        
-            return "";
-        }
     }
 }
