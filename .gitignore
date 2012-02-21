@@ -1,4 +1,13 @@
 /target
 /.settings
 /.classpath
-/.project
+
+# Java specific
+*.class
+
+# Python specific
+*.pyc
+
+# Eclipse Project settings
+.project
+.pydevproject
