@@ -7,5 +7,6 @@ Part of the SCAPE Project: http://www.scape-project.eu/
 
 Branches
 --------
-master - Main release branch
-python - Python development branch (may be ahead of the master branch, but may not be stable)
+master - Main release branch.
+
+python - Python development branch (may be ahead of the master branch, but may not be stable).
