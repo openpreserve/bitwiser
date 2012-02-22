@@ -8,13 +8,13 @@ __author__ = 'Peter May (Peter.May@bl.uk)'
 __license__ = 'Apache Software License, Version 2.0'
 __version__ = '0.0.1'
 
-
 from io import FileIO
 import argparse
 import os
 import shutil
 import struct
 import subprocess
+import sys
 
 CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
 
@@ -63,7 +63,7 @@ class BitManipulator(object):
         
     @staticmethod
     def bits(file):
-        """Generator of bits in the specified file"""
+        """Exposes bits from the specified file as a Generator"""
         bytes = (ord(b) for b in file.read())
         for b in bytes:
             for i in xrange(8):
@@ -99,15 +99,16 @@ def analyse(testfile, byteflipping=False):
     # open temporary file and flip bits/bytes
     filelen = os.path.getsize(tmp_file) if byteflipping else 8*os.path.getsize(tmp_file)
     for i in xrange(filelen):
-        print "Completed (%d/%d): %d%%"%(i,filelen,(100*i/filelen))
         BitManipulator.flipAt(tmp_file, i, byteflipping)    # flip bit/byte
         output = __runCommand(CMD_CONVERT, tmp_file, CONV_FILE)
         BitManipulator.flipAt(tmp_file, i, byteflipping)    # return to normality
         
-        if output.exitcode==0:
+        if output.exitcode==expected.exitcode:
             clear+=1
         else:
             error+=1
+            
+        print "Completed (%d/%d): %d%%"%(i+1,filelen,(100*(i+1)/filelen))
 
     # clear up
     os.remove(tmp_file)
@@ -121,10 +122,23 @@ def __runCommand(command, inputfile, outputfile):
        returns: Output object
        
     """
-    
-    process = subprocess.Popen([command, inputfile, outputfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #print sys.platform
+    # See http://www.activestate.com/blog/2007/11/supressing-windows-error-report-messagebox-subprocess-and-ctypes
+    # and http://stackoverflow.com/questions/5069224/handling-subprocess-crash-in-windows
+    subprocess_flags = 0
+    if sys.platform.startswith("win"):
+        import ctypes
+        SEM_NOGPFAULTERRORBOX = 0x0002  # From http://msdn.microsoft.com/en-us/library/ms680621(VS100).aspx
+        ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX) #@UndefinedVariable
+        subprocess_flags = 0x8000000    # win32con.CREATE_NO_WINDOW
+
+    process = subprocess.Popen([command, inputfile, outputfile], 
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
+                               creationflags=subprocess_flags)
+
     exitcode = process.wait()
     output = process.communicate()
+    
     return Output(exitcode, output[0], output[1])
 
 
