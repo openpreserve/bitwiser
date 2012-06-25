@@ -10,6 +10,7 @@ __version__ = '0.0.2'
 
 from io import FileIO
 import argparse
+import datetime
 import os
 import shutil
 import struct
@@ -17,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import hashlib
+import time
 from string import Template
 
 #CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
@@ -33,6 +35,7 @@ TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
 # TIKA? VSLOW
 # DROID? VVSLOW
 #===============================================================================
+
 
 class Output:
     def __init__(self, exitcode, stdout, stderr):
@@ -89,6 +92,11 @@ class BitManipulator(object):
             raise IndexError("Position "+str(position)+" is out of range")
         return (byte>>(7-position))&1
     
+    @staticmethod
+    def setBitOfByteAt(byte, bit, position):
+        if not 0<=position<8:
+            raise IndexError("Position "+str(position)+" is out of range")
+        return byte|(bit<<(7-position))
 
 def md5sum(filename):
     md5 = hashlib.md5()
@@ -97,15 +105,17 @@ def md5sum(filename):
              md5.update(chunk)
     return md5.hexdigest()
 
-def analyse(testfile, byteflipping=False):
+def analyse(testfile, outfile, byteflipping=False):
     """Run the convert command on the specified input test file.
     
        If True, byteflipping indicates that whole bytes should be flipped,
        rather than the default individual bits.
        
     """
+    
     # Store the absolute path of the test file
     testfile = os.path.abspath(testfile)
+    outfile = os.path.abspath(outfile)
     
     # create a temporary folder to run in, and cd into it:
     tmp_dir = tempfile.mkdtemp()
@@ -115,6 +125,9 @@ def analyse(testfile, byteflipping=False):
     # create a temporary file for bit manipulation
     tmp_file = os.path.basename(testfile)
     shutil.copyfile(testfile, tmp_file)
+    
+    # create the specified output file
+    rout_file = file(outfile, 'wb')
     
     # run command on original to get desired output for comparison
     out_file = "out.jp2"
@@ -129,6 +142,8 @@ def analyse(testfile, byteflipping=False):
     out_none = 0
     
     # open temporary file and flip bits/bytes
+    outbyte = 0
+    bit = 0
     filelen = os.path.getsize(tmp_file) if byteflipping else 8*os.path.getsize(tmp_file)
     for i in xrange(filelen):
         # Flip bit/byte
@@ -148,15 +163,28 @@ def analyse(testfile, byteflipping=False):
             md5 = md5sum(out_file)
             if md5 == expected_md5:
                 out_unchanged+=1
+                outbyte = BitManipulator.setBitOfByteAt(outbyte, 1, bit)
             else:
                 out_changed+=1
             os.remove(out_file)
         else:
             out_none+=1
 
+        if bit==7:
+            rout_file.write("%c"%outbyte)
+            rout_file.flush()
+            outbyte = 0
+            bit = 0
+        else:
+            # increment bit counter
+            bit += 1
+
         # Report percentage complete:        
         if not i%100:
             print "Completed (%d/%d): %d%%"%(i+1,filelen,(100*(i+1)/filelen))
+
+    # close file
+    rout_file.close()
 
     # clear up
     if os.path.exists(tmp_file):
@@ -175,6 +203,8 @@ def __runCommand(command, inputfile, outputfile):
        returns: Output object
        
     """
+    timeout = 5 # 5 second timeout
+    
     #print sys.platform
     # See http://www.activestate.com/blog/2007/11/supressing-windows-error-report-messagebox-subprocess-and-ctypes
     # and http://stackoverflow.com/questions/5069224/handling-subprocess-crash-in-windows
@@ -185,9 +215,19 @@ def __runCommand(command, inputfile, outputfile):
         ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX) #@UndefinedVariable
         subprocess_flags = 0x8000000    # win32con.CREATE_NO_WINDOW
 
+    start = datetime.datetime.now()
     process = subprocess.Popen([command, inputfile, outputfile], 
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
                                creationflags=subprocess_flags)
+    
+    while process.poll() is None:
+        time.sleep(0.1)
+        now = datetime.datetime.now()
+        if (now-start).seconds>timeout:
+            pid = process.pid
+            process.kill()
+#            os.waitpid(pid)
+            return None
 
     exitcode = process.wait()
     output = process.communicate()
@@ -199,10 +239,11 @@ def __runCommand(command, inputfile, outputfile):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run the Bitwise Analyser over the specified command')
     parser.add_argument('file', help='example input file to test with')
+    parser.add_argument('out', help='output file to write results to')
     parser.add_argument('--bytes', action='store_true', help='use byte-level flipping, rather than bit flipping')
     
     args = parser.parse_args()
-    results = analyse(args.file, args.bytes)
+    results = analyse(args.file, args.out, args.bytes)
     print "Results compared to original file execution:"
     print " #Byte mods causing expected exit code:  ",results[0]
     print " #Byte mods causing unexpected exit code:",results[1]
