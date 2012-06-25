@@ -10,15 +10,17 @@ __version__ = '0.0.1'
 
 from io import FileIO
 import argparse
+import datetime
 import os
 import shutil
 import struct
 import subprocess
 import sys
+import time
 
-CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
+CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.7-Q16/convert"
 
-TEMP_DIR = "C:/Projects/SCAPE/BitWiser/Data/"
+TEMP_DIR = "C:/Projects/Bitwiser/Data/"
 CONV_FILE   = os.path.join(TEMP_DIR, "conv.jp2")
 
 class Output:
@@ -76,18 +78,26 @@ class BitManipulator(object):
             raise IndexError("Position "+str(position)+" is out of range")
         return (byte>>(7-position))&1
     
+    @staticmethod
+    def setBitOfByteAt(byte, bit, position):
+        if not 0<=position<8:
+            raise IndexError("Position "+str(position)+" is out of range")
+        return byte|(bit<<(7-position))
 
-def analyse(testfile, byteflipping=False):
+def analyse(testfile, outfile, byteflipping=False):
     """Run the convert command on the specified input test file.
     
        If True, byteflipping indicates that whole bytes should be flipped,
        rather than the default individual bits.
        
     """
-    
+
     # create a temporary file for bit manipulation
     tmp_file = os.path.join(TEMP_DIR, "tmp."+os.path.basename(testfile))
     shutil.copyfile(testfile, tmp_file)
+    
+    # create the specified output file
+    out_file = file(outfile, 'wb')
     
     # run command on original to get desired output for comparison
     expected = __runCommand(CMD_CONVERT, tmp_file, CONV_FILE)
@@ -97,18 +107,34 @@ def analyse(testfile, byteflipping=False):
     error = 0
     
     # open temporary file and flip bits/bytes
+    outbyte = 0
+    bit = 0
     filelen = os.path.getsize(tmp_file) if byteflipping else 8*os.path.getsize(tmp_file)
     for i in xrange(filelen):
         BitManipulator.flipAt(tmp_file, i, byteflipping)    # flip bit/byte
         output = __runCommand(CMD_CONVERT, tmp_file, CONV_FILE)
         BitManipulator.flipAt(tmp_file, i, byteflipping)    # return to normality
-        
-        if output.exitcode==expected.exitcode:
-            clear+=1
-        else:
+               
+        if output==None or output.exitcode!=expected.exitcode:
             error+=1
-            
+            outbyte = BitManipulator.setBitOfByteAt(outbyte, 1, bit)
+        else:
+            clear+=1
+
         print "Completed (%d/%d): %d%%"%(i+1,filelen,(100*(i+1)/filelen))
+
+        if bit==7:
+            out_file.write("%c"%outbyte)
+            #out_file.write(outbyte)
+            out_file.flush()
+            outbyte = 0
+            bit = 0
+        else:
+            # increment bit counter
+            bit += 1
+
+    # close file
+    out_file.close()
 
     # clear up
     os.remove(tmp_file)
@@ -122,6 +148,8 @@ def __runCommand(command, inputfile, outputfile):
        returns: Output object
        
     """
+    timeout = 5 # 5 second timeout
+    
     #print sys.platform
     # See http://www.activestate.com/blog/2007/11/supressing-windows-error-report-messagebox-subprocess-and-ctypes
     # and http://stackoverflow.com/questions/5069224/handling-subprocess-crash-in-windows
@@ -132,9 +160,19 @@ def __runCommand(command, inputfile, outputfile):
         ctypes.windll.kernel32.SetErrorMode(SEM_NOGPFAULTERRORBOX) #@UndefinedVariable
         subprocess_flags = 0x8000000    # win32con.CREATE_NO_WINDOW
 
+    start = datetime.datetime.now()
     process = subprocess.Popen([command, inputfile, outputfile], 
                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
                                creationflags=subprocess_flags)
+    
+    while process.poll() is None:
+        time.sleep(0.1)
+        now = datetime.datetime.now()
+        if (now-start).seconds>timeout:
+            pid = process.pid
+            process.kill()
+#            os.waitpid(pid)
+            return None
 
     exitcode = process.wait()
     output = process.communicate()
@@ -146,10 +184,11 @@ def __runCommand(command, inputfile, outputfile):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run the Bitwise Analyser over the specified command')
     parser.add_argument('file', help='example input file to test with')
+    parser.add_argument('out', help='output file to write results to')
     parser.add_argument('--bytes', action='store_true', help='use byte-level flipping, rather than bit flipping')
     
     args = parser.parse_args()
-    results = analyse(args.file, args.bytes)
+    results = analyse(args.file, args.out, args.bytes)
     print "Results compared to original file execution:"
     print " #Byte mods causing same output as original:",results[0]
     print " #Byte mods causing different outputs:      ",results[1]
