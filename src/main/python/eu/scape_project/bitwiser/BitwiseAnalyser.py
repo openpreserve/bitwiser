@@ -1,12 +1,12 @@
 """
-Brute force bitwise analysis of transformations and analysers.
+Brute-force bitwise analysis of transformations and analysers.
 
 Created on Feb 15, 2012
 """
 
-__author__ = 'Peter May (Peter.May@bl.uk)'
+__author__ = 'Peter May (Peter.May@bl.uk), Andrew Jackson (Andrew.Jackson@bl.uk)'
 __license__ = 'Apache Software License, Version 2.0'
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 from io import FileIO
 import argparse
@@ -15,11 +15,24 @@ import shutil
 import struct
 import subprocess
 import sys
+import tempfile
+import hashlib
+from string import Template
 
-CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
+#CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
+CMD_CONVERT = "convert"
 
-TEMP_DIR = "C:/Projects/SCAPE/BitWiser/Data/"
-CONV_FILE   = os.path.join(TEMP_DIR, "conv.jp2")
+TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
+#===============================================================================
+# s.substitute(who='tim', what='kung pao')
+#
+# identify -verbose src/test/resources/chrome_32x32_lzw.tif > identify.out
+# jpylyzer
+# jp2structCheck
+# file
+# TIKA? VSLOW
+# DROID? VVSLOW
+#===============================================================================
 
 class Output:
     def __init__(self, exitcode, stdout, stderr):
@@ -77,6 +90,13 @@ class BitManipulator(object):
         return (byte>>(7-position))&1
     
 
+def md5sum(filename):
+    md5 = hashlib.md5()
+    with open(filename,'rb') as f: 
+        for chunk in iter(lambda: f.read(128*md5.block_size), b''): 
+             md5.update(chunk)
+    return md5.hexdigest()
+
 def analyse(testfile, byteflipping=False):
     """Run the convert command on the specified input test file.
     
@@ -84,37 +104,70 @@ def analyse(testfile, byteflipping=False):
        rather than the default individual bits.
        
     """
+    # Store the absolute path of the test file
+    testfile = os.path.abspath(testfile)
+    
+    # create a temporary folder to run in, and cd into it:
+    tmp_dir = tempfile.mkdtemp()
+    saved_path = os.getcwd()
+    os.chdir(tmp_dir)
     
     # create a temporary file for bit manipulation
-    tmp_file = os.path.join(TEMP_DIR, "tmp."+os.path.basename(testfile))
+    tmp_file = os.path.basename(testfile)
     shutil.copyfile(testfile, tmp_file)
     
     # run command on original to get desired output for comparison
-    expected = __runCommand(CMD_CONVERT, tmp_file, CONV_FILE)
-    
+    out_file = "out.jp2"
+    expected = __runCommand(CMD_CONVERT, tmp_file, out_file)
+    expected_md5 = md5sum(out_file)
+
     # stats
     clear = 0
     error = 0
+    out_unchanged = 0
+    out_changed = 0
+    out_none = 0
     
     # open temporary file and flip bits/bytes
     filelen = os.path.getsize(tmp_file) if byteflipping else 8*os.path.getsize(tmp_file)
     for i in xrange(filelen):
-        BitManipulator.flipAt(tmp_file, i, byteflipping)    # flip bit/byte
-        output = __runCommand(CMD_CONVERT, tmp_file, CONV_FILE)
-        BitManipulator.flipAt(tmp_file, i, byteflipping)    # return to normality
+        # Flip bit/byte
+        BitManipulator.flipAt(tmp_file, i, byteflipping)
+        # Run the program again:
+        output = __runCommand(CMD_CONVERT, tmp_file, out_file)
+        # Flip the bit(s) back
+        BitManipulator.flipAt(tmp_file, i, byteflipping)
         
+        # Check and clean up:
         if output.exitcode==expected.exitcode:
             clear+=1
         else:
             error+=1
-            
-        print "Completed (%d/%d): %d%%"%(i+1,filelen,(100*(i+1)/filelen))
+        # Is there a file, and is it the same as before?
+        if os.path.exists(out_file):
+            md5 = md5sum(out_file)
+            if md5 == expected_md5:
+                out_unchanged+=1
+            else:
+                out_changed+=1
+            os.remove(out_file)
+        else:
+            out_none+=1
+
+        # Report percentage complete:        
+        if not i%100:
+            print "Completed (%d/%d): %d%%"%(i+1,filelen,(100*(i+1)/filelen))
 
     # clear up
-    os.remove(tmp_file)
-    os.remove(CONV_FILE)
+    if os.path.exists(tmp_file):
+        os.remove(tmp_file)
+    shutil.rmtree(tmp_dir)
+    
+    # chdir back:
+    os.chdir(saved_path)
+    
     # and return
-    return (clear, error)
+    return (clear, error, out_none, out_unchanged, out_changed)
 
 def __runCommand(command, inputfile, outputfile):
     """Runs the specified command on the specified input file.
@@ -151,5 +204,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     results = analyse(args.file, args.bytes)
     print "Results compared to original file execution:"
-    print " #Byte mods causing same output as original:",results[0]
-    print " #Byte mods causing different outputs:      ",results[1]
+    print " #Byte mods causing expected exit code:  ",results[0]
+    print " #Byte mods causing unexpected exit code:",results[1]
+    print " #Byte mods causing no output:           ",results[2]
+    print " #Byte mods causing identical output:    ",results[3]
+    print " #Byte mods causing changed output:      ",results[4]
+    
