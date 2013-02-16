@@ -23,6 +23,8 @@ from string import Template
 
 #CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
 CMD_CONVERT = "convert"
+CMD_PWD= "pwd"
+CMD_JPL = "/Users/andy/Documents/workspace/bitwiser/tools/bitwise-jpylyzer.sh"
 
 TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
 #===============================================================================
@@ -130,9 +132,13 @@ def analyse(testfile, outfile, byteflipping=False):
     rout_file = file(outfile, 'wb')
     
     # run command on original to get desired output for comparison
-    out_file = "out.jp2"
+    out_file = outfile+"-initial.png"
     expected = __runCommand(CMD_CONVERT, tmp_file, out_file)
+    print "EXPECTED:",expected.exitcode
+    print "EXPECTED:",expected.stdout
+    print "EXPECTED:",expected.stderr
     expected_md5 = md5sum(out_file)
+    print "EXPECTED_MD5:",expected_md5
 
     # stats
     clear = 0
@@ -142,6 +148,7 @@ def analyse(testfile, outfile, byteflipping=False):
     out_none = 0
     
     # open temporary file and flip bits/bytes
+    out_file = "out-test.png"
     outbyte = 0
     bit = 0
     filelen = os.path.getsize(tmp_file) if byteflipping else 8*os.path.getsize(tmp_file)
@@ -203,6 +210,8 @@ def __runCommand(command, inputfile, outputfile):
        returns: Output object
        
     """
+    #cmd = [command,inputfile,outputfile]
+    cmd = [CMD_JPL, inputfile, outputfile ]
     timeout = 5 # 5 second timeout
     
     #print sys.platform
@@ -216,8 +225,7 @@ def __runCommand(command, inputfile, outputfile):
         subprocess_flags = 0x8000000    # win32con.CREATE_NO_WINDOW
 
     start = datetime.datetime.now()
-    process = subprocess.Popen([command, inputfile, outputfile], 
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
                                creationflags=subprocess_flags)
     
     while process.poll() is None:
@@ -227,11 +235,13 @@ def __runCommand(command, inputfile, outputfile):
             pid = process.pid
             process.kill()
 #            os.waitpid(pid)
-            return None
+            return Output(100001,"","")
 
     exitcode = process.wait()
     output = process.communicate()
-    
+
+    # print output[0], output[1]
+        
     return Output(exitcode, output[0], output[1])
 
 

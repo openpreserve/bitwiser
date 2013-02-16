@@ -39,6 +39,8 @@ import eu.scape_project.bitwiser.utils.StreamReader;
  *  - Coverage: Fraction of bit-flips that change the resulting file (including no-output).
  *  - Transmission: Bitwise difference in output file compared to the input file. ???
  *  - Fuzzing: Fraction of bit-flips that cause the process to flip out/hang/asplode.
+ *  
+ *  Largely superceded by the Python version.
  * 
  * 
  * @author anj
@@ -94,6 +96,7 @@ public class BitwiseAnalyser {
             if( result.equals(truth) ) {
                 clears++;
             }
+            // To do - add flipBitAt as an alternative (and default):
             flipByteAt(rf,pos);
         }
         System.out.println("Clears: "+clears+"/"+tempFile.length());
@@ -104,6 +107,21 @@ public class BitwiseAnalyser {
         byte b = rf.readByte();
         b = (byte) (b ^ 0xff);
         rf.seek(pos);
+        rf.write(b);
+    }
+
+    /**
+     * 
+     * @param rf the file
+     * @param bytepos byte position in file, 0 - len-1
+     * @param bitpos bit position in file, 0 - 7
+     * @throws IOException
+     */
+    static void flipBitAt(RandomAccessFile rf, long bytepos, int bitpos ) throws IOException {
+        rf.seek(bytepos);
+        byte b = rf.readByte();
+        b = (byte) (b ^ (1<<(7-bitpos)));
+        rf.seek(bytepos);
         rf.write(b);
     }
     
