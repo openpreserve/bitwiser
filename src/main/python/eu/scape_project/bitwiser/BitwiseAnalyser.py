@@ -15,6 +15,7 @@ import os
 import shutil
 import struct
 import subprocess
+import signal
 import sys
 import tempfile
 import hashlib
@@ -23,10 +24,17 @@ from string import Template
 
 #CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
 CMD_CONVERT = "convert"
-CMD_PWD= "pwd"
-CMD_JPL = "/Users/andy/Documents/workspace/bitwiser/tools/bitwise-jpylyzer.sh"
+CMD_JPL = "/home/anj/bitwiser/tools/bitwise-jpylyzer.sh"
+CMD_JSC = "/home/anj/bitwiser/tools/bitwise-jp2StructCheck.sh"
+CMD_OJD = "/home/anj/bitwiser/tools/bitwise-openjpeg-decompress.sh"
+CMD_KDD = "/home/anj/bitwiser/tools/bitwise-kdu-decompress.sh"
+CMD_FID = "/home/anj/bitwiser/tools/bitwise-file.sh"
+CMD = CMD_OJD
 
-TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
+#TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
+
+OUTFREQ = 100
+
 #===============================================================================
 # s.substitute(who='tim', what='kung pao')
 #
@@ -128,12 +136,17 @@ def analyse(testfile, outfile, byteflipping=False):
     tmp_file = os.path.basename(testfile)
     shutil.copyfile(testfile, tmp_file)
     
+    # Reset the file timestamps to avoid the output changing if they are included.
+    file_ts = os.path.getmtime(testfile)
+    os.utime(tmp_file,(file_ts, file_ts))
+
     # create the specified output file
     rout_file = file(outfile, 'wb')
+
     
     # run command on original to get desired output for comparison
-    out_file = outfile+"-initial.png"
-    expected = __runCommand(CMD_CONVERT, tmp_file, out_file)
+    out_file = outfile+"-initial"
+    expected = __runCommand(CMD, tmp_file, out_file)
     print "EXPECTED:",expected.exitcode
     print "EXPECTED:",expected.stdout
     print "EXPECTED:",expected.stderr
@@ -148,17 +161,17 @@ def analyse(testfile, outfile, byteflipping=False):
     out_none = 0
     
     # open temporary file and flip bits/bytes
-    out_file = "out-test.png"
+    out_file = "out-test"
     outbyte = 0
     bit = 0
     filelen = os.path.getsize(tmp_file) if byteflipping else 8*os.path.getsize(tmp_file)
     for i in xrange(filelen):
         # Flip bit/byte
         BitManipulator.flipAt(tmp_file, i, byteflipping)
+        # Reset the file timestamps to avoid the output changing if they are included.
+        os.utime(tmp_file,(file_ts, file_ts))
         # Run the program again:
-        output = __runCommand(CMD_CONVERT, tmp_file, out_file)
-        # Flip the bit(s) back
-        BitManipulator.flipAt(tmp_file, i, byteflipping)
+        output = __runCommand(CMD, tmp_file, out_file)
         
         # Check and clean up:
         if output.exitcode==expected.exitcode:
@@ -173,6 +186,9 @@ def analyse(testfile, outfile, byteflipping=False):
                 outbyte = BitManipulator.setBitOfByteAt(outbyte, 1, bit)
             else:
                 out_changed+=1
+            if not i%OUTFREQ:
+                shutil.copyfile(tmp_file,"%s-in-%d"%(outfile,i))
+                shutil.copyfile(out_file,"%s-out-%d"%(outfile,i))
             os.remove(out_file)
         else:
             out_none+=1
@@ -186,9 +202,13 @@ def analyse(testfile, outfile, byteflipping=False):
             # increment bit counter
             bit += 1
 
+        # Flip the bit(s) back
+        BitManipulator.flipAt(tmp_file, i, byteflipping)
+
         # Report percentage complete:        
-        if not i%100:
+        if not i%OUTFREQ:
             print "Completed (%d/%d): %d%%"%(i+1,filelen,(100*(i+1)/filelen))
+            print clear, error, out_none, out_unchanged, out_changed
 
     # close file
     rout_file.close()
@@ -210,8 +230,8 @@ def __runCommand(command, inputfile, outputfile):
        returns: Output object
        
     """
-    #cmd = [command,inputfile,outputfile]
-    cmd = [CMD_JPL, inputfile, outputfile ]
+    cmd = [command,inputfile,outputfile]
+    #cmd = [CMD_JPL, inputfile, outputfile ]
     timeout = 5 # 5 second timeout
     
     #print sys.platform
@@ -226,15 +246,19 @@ def __runCommand(command, inputfile, outputfile):
 
     start = datetime.datetime.now()
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
-                               creationflags=subprocess_flags)
+                               creationflags=subprocess_flags, 
+			       preexec_fn=os.setsid )
     
     while process.poll() is None:
         time.sleep(0.1)
         now = datetime.datetime.now()
         if (now-start).seconds>timeout:
-            pid = process.pid
-            process.kill()
+#            process.kill()
+            os.killpg(process.pid, signal.SIGTERM)
+#            pid = process.pid
 #            os.waitpid(pid)
+            # Also copy off the input time that caused the hang:
+            shutil.copyfile(inputfile,"%s-killed-%d"%(inputfile,process.pid)) 
             return Output(100001,"","")
 
     exitcode = process.wait()
