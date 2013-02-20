@@ -24,12 +24,13 @@ from string import Template
 
 #CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
 CMD_CONVERT = "convert"
-CMD_JPL = "/home/anj/bitwiser/tools/bitwise-jpylyzer.sh"
+CMD_FID = "/home/anj/bitwiser/tools/bitwise-file.sh"
 CMD_JSC = "/home/anj/bitwiser/tools/bitwise-jp2StructCheck.sh"
+CMD_JHO = "/home/anj/bitwiser/tools/bitwise-jhove.sh"
+CMD_JPL = "/home/anj/bitwiser/tools/bitwise-jpylyzer.sh"
 CMD_OJD = "/home/anj/bitwiser/tools/bitwise-openjpeg-decompress.sh"
 CMD_KDD = "/home/anj/bitwiser/tools/bitwise-kdu-decompress.sh"
-CMD_FID = "/home/anj/bitwiser/tools/bitwise-file.sh"
-CMD = CMD_OJD
+CMD = CMD_JHO
 
 #TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
 
@@ -193,6 +194,7 @@ def analyse(testfile, outfile, byteflipping=False):
         else:
             out_none+=1
 
+        # Write the result bitmap out:
         if bit==7:
             rout_file.write("%c"%outbyte)
             rout_file.flush()
@@ -231,7 +233,7 @@ def __runCommand(command, inputfile, outputfile):
        
     """
     cmd = [command,inputfile,outputfile]
-    #cmd = [CMD_JPL, inputfile, outputfile ]
+
     timeout = 5 # 5 second timeout
     
     #print sys.platform
@@ -247,7 +249,7 @@ def __runCommand(command, inputfile, outputfile):
     start = datetime.datetime.now()
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
                                creationflags=subprocess_flags, 
-			       preexec_fn=os.setsid )
+                               preexec_fn=os.setsid )
     
     while process.poll() is None:
         time.sleep(0.1)
@@ -277,11 +279,14 @@ if __name__ == '__main__':
     parser.add_argument('--bytes', action='store_true', help='use byte-level flipping, rather than bit flipping')
     
     args = parser.parse_args()
+    start_time = time.time()
     results = analyse(args.file, args.out, args.bytes)
+    elapsed_time = time.time() - start_time
     print "Results compared to original file execution:"
     print " #Byte mods causing expected exit code:  ",results[0]
     print " #Byte mods causing unexpected exit code:",results[1]
     print " #Byte mods causing no output:           ",results[2]
     print " #Byte mods causing identical output:    ",results[3]
     print " #Byte mods causing changed output:      ",results[4]
+    print "Elapsed time: ",elapsed_time
     

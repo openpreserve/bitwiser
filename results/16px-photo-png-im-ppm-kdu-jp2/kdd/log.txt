@@ -1,0 +1,140 @@
+anj@anj-VirtualBox:~/bitwiser$ python src/main/python/eu/scape_project/bitwiser/BitwiseAnalyser.py src/test/resources/16px-photo-png-im-ppm-kdu.jp2 out-kdu-kdd
+EXPECTED: 0
+EXPECTED: 
+Consumed 1 tile-part(s) from a total of 1 tile(s).
+Code-stream bytes (excluding any file format) = 686 = 21.437500 bits/pel.
+Processed using the single-threaded environment (see `-num_threads')
+
+EXPECTED: 
+EXPECTED_MD5: 37b93e3099116b2421631a431570730a
+Completed (1/6184): 0%
+0 1 1 0 0
+Completed (101/6184): 1%
+0 101 101 0 0
+Completed (201/6184): 3%
+41 160 160 41 0
+Completed (301/6184): 4%
+64 237 237 64 0
+Completed (401/6184): 6%
+80 321 321 64 16
+Completed (501/6184): 8%
+149 352 352 89 60
+Completed (601/6184): 9%
+160 441 441 100 60
+Completed (701/6184): 11%
+190 511 511 125 65
+Completed (801/6184): 12%
+225 576 576 130 95
+Completed (901/6184): 14%
+267 634 634 158 109
+Completed (1001/6184): 16%
+301 700 700 192 109
+Completed (1101/6184): 17%
+365 736 736 192 173
+Completed (1201/6184): 19%
+426 775 775 231 195
+Completed (1301/6184): 21%
+503 798 798 279 224
+Completed (1401/6184): 22%
+603 798 798 309 294
+Completed (1501/6184): 24%
+698 803 803 326 372
+Completed (1601/6184): 25%
+785 816 816 384 401
+Completed (1701/6184): 27%
+868 833 833 437 431
+Completed (1801/6184): 29%
+968 833 833 537 431
+Completed (1901/6184): 30%
+1068 833 833 637 431
+Completed (2001/6184): 32%
+1168 833 833 737 431
+Completed (2101/6184): 33%
+1268 833 833 837 431
+Completed (2201/6184): 35%
+1368 833 833 937 431
+Completed (2301/6184): 37%
+1468 833 833 1037 431
+Completed (2401/6184): 38%
+1551 850 850 1120 431
+Completed (2501/6184): 40%
+1636 865 865 1161 475
+Completed (2601/6184): 42%
+1736 865 865 1173 563
+Completed (2701/6184): 43%
+1836 865 865 1210 626
+Completed (2801/6184): 45%
+1936 865 865 1214 722
+Completed (2901/6184): 46%
+2036 865 865 1229 807
+Completed (3001/6184): 48%
+2136 865 865 1234 902
+Completed (3101/6184): 50%
+2236 865 865 1247 989
+Completed (3201/6184): 51%
+2336 865 865 1249 1087
+Completed (3301/6184): 53%
+2436 865 865 1257 1179
+Completed (3401/6184): 54%
+2536 865 865 1267 1269
+Completed (3501/6184): 56%
+2636 865 865 1274 1362
+Completed (3601/6184): 58%
+2736 865 865 1282 1454
+Completed (3701/6184): 59%
+2836 865 865 1291 1545
+Completed (3801/6184): 61%
+2936 865 865 1293 1643
+Completed (3901/6184): 63%
+3036 865 865 1293 1743
+Completed (4001/6184): 64%
+3136 865 865 1297 1839
+Completed (4101/6184): 66%
+3236 865 865 1299 1937
+Completed (4201/6184): 67%
+3336 865 865 1302 2034
+Completed (4301/6184): 69%
+3436 865 865 1310 2126
+Completed (4401/6184): 71%
+3536 865 865 1313 2223
+Completed (4501/6184): 72%
+3636 865 865 1323 2313
+Completed (4601/6184): 74%
+3736 865 865 1324 2412
+Completed (4701/6184): 76%
+3836 865 865 1328 2508
+Completed (4801/6184): 77%
+3936 865 865 1328 2608
+Completed (4901/6184): 79%
+4036 865 865 1328 2708
+Completed (5001/6184): 80%
+4136 865 865 1328 2808
+Completed (5101/6184): 82%
+4236 865 865 1328 2908
+Completed (5201/6184): 84%
+4336 865 865 1328 3008
+Completed (5301/6184): 85%
+4436 865 865 1328 3108
+Completed (5401/6184): 87%
+4536 865 865 1331 3205
+Completed (5501/6184): 88%
+4636 865 865 1331 3305
+Completed (5601/6184): 90%
+4736 865 865 1331 3405
+Completed (5701/6184): 92%
+4836 865 865 1338 3498
+Completed (5801/6184): 93%
+4936 865 865 1338 3598
+Completed (5901/6184): 95%
+5036 865 865 1345 3691
+Completed (6001/6184): 97%
+5136 865 865 1349 3787
+Completed (6101/6184): 98%
+5236 865 865 1349 3887
+Results compared to original file execution:
+ #Byte mods causing expected exit code:   5319
+ #Byte mods causing unexpected exit code: 865
+ #Byte mods causing no output:            865
+ #Byte mods causing identical output:     1368
+ #Byte mods causing changed output:       3951
+
