@@ -22,17 +22,18 @@ import hashlib
 import time
 from string import Template
 
-#CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert"
-CMD_CONVERT = "convert"
+CMD_CONVERT = "/home/anj/bitwiser/tools/bitwise-convert-to-png.sh"
 CMD_FID = "/home/anj/bitwiser/tools/bitwise-file.sh"
+CMD_EXV = "/home/anj/bitwiser/tools/bitwise-exiftool-v.sh"
 CMD_JSC = "/home/anj/bitwiser/tools/bitwise-jp2StructCheck.sh"
 CMD_JHO = "/home/anj/bitwiser/tools/bitwise-jhove.sh"
+CMD_JHV = "/home/anj/bitwiser/tools/bitwise-jhove-valid.sh"
+CMD_JHV_14 = "/home/anj/bitwiser/tools/bitwise-jhove-1.4-valid.sh"
 CMD_JPL = "/home/anj/bitwiser/tools/bitwise-jpylyzer.sh"
+CMD_JPV = "/home/anj/bitwiser/tools/bitwise-jpylyzer-valid.sh"
 CMD_OJD = "/home/anj/bitwiser/tools/bitwise-openjpeg-decompress.sh"
 CMD_KDD = "/home/anj/bitwiser/tools/bitwise-kdu-decompress.sh"
-CMD = CMD_JHO
-
-#TMPL_CONVERT = Template("convert ${in_file} ${out_file.jp2}")
+CMD = CMD_CONVERT
 
 OUTFREQ = 100
 
@@ -283,10 +284,10 @@ if __name__ == '__main__':
     results = analyse(args.file, args.out, args.bytes)
     elapsed_time = time.time() - start_time
     print "Results compared to original file execution:"
-    print " #Byte mods causing expected exit code:  ",results[0]
-    print " #Byte mods causing unexpected exit code:",results[1]
-    print " #Byte mods causing no output:           ",results[2]
-    print " #Byte mods causing identical output:    ",results[3]
-    print " #Byte mods causing changed output:      ",results[4]
+    print " # mods causing expected exit code:  ",results[0]
+    print " # mods causing unexpected exit code:",results[1]
+    print " # mods causing no output:           ",results[2]
+    print " # mods causing identical output:    ",results[3]
+    print " # mods causing changed output:      ",results[4]
     print "Elapsed time: ",elapsed_time
     
