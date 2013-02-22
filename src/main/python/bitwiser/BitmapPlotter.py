@@ -5,15 +5,18 @@ import Image, ImageDraw
 
 def draw_bitmap(data, name):
     length = len(data)
-    side = int(length**0.5)
-    c = Image.new("RGB", (side,side))
+    side = int(length**0.5)+1
+    c = Image.new("RGBA", (side,side))
     cd = ImageDraw.Draw(c)
     cd.point((0, 0), fill="red")
     for i in xrange(side):
         for j in xrange(side):
-            val = ord(data[j+side*i]);
+            index = j+side*i
+            if index >= length:
+                break
+            val = ord(data[index])
             cd.point((j,i), fill=(val,val,val))
-    c.resize( (side*2,side*2) )
+    #c.resize( (side*2,side*2) )
     c.save(name)
 
 def main():
@@ -32,7 +35,7 @@ def main():
     if len(args) not in [1, 2]:
         parser.error("Please specify input and output file.")
 
-    d = file(args[0]).read()
+    d = open(args[0], "rb").read()
     if len(args) == 2:
         dst = args[1]
     else:
