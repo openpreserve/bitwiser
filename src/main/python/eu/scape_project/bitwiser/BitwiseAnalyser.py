@@ -33,7 +33,7 @@ CMD_JPL = "/home/anj/bitwiser/tools/bitwise-jpylyzer.sh"
 CMD_JPV = "/home/anj/bitwiser/tools/bitwise-jpylyzer-valid.sh"
 CMD_OJD = "/home/anj/bitwiser/tools/bitwise-openjpeg-decompress.sh"
 CMD_KDD = "/home/anj/bitwiser/tools/bitwise-kdu-decompress.sh"
-CMD = CMD_CONVERT
+CMD = CMD_JHO
 
 OUTFREQ = 100
 
@@ -283,6 +283,7 @@ if __name__ == '__main__':
     start_time = time.time()
     results = analyse(args.file, args.out, args.bytes)
     elapsed_time = time.time() - start_time
+    print "Ran",CMD,"on",args.file
     print "Results compared to original file execution:"
     print " # mods causing expected exit code:  ",results[0]
     print " # mods causing unexpected exit code:",results[1]
