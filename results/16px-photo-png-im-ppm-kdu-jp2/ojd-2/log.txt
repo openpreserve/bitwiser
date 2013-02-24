@@ -1,0 +1,182 @@
+EXPECTED: 0
+EXPECTED: [INFO] Start to read j2k main header (85).
+[INFO] Main header has been correctly decoded.
+[INFO] No decoded area parameters, set the decoded area to the whole image
+[INFO] Header of tile 0 / 0 has been read.
+[INFO] Tile 1/1 has been decoded.
+[INFO] Image data has been updated with tile 1.
+
+[INFO] Stream reached its end !
+Successfully generated Outfile /home/anj/bitwiser/out-kdu-opj-2-initial.png
+
+EXPECTED: 
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No incltree created.
+WARNING in tgt_create_v2 tree->numnodes == 0, no tree created.
+WARNING: No imsbtree created.
+
+EXPECTED_MD5: f761567b1af9cf22e26dd445e87ce9a6
+Completed (1/6184): 0%
+0 1 1 0 0
+Completed (101/6184): 1%
+0 101 101 0 0
+Completed (201/6184): 3%
+74 127 127 74 0
+Completed (301/6184): 4%
+142 159 159 142 0
+Completed (401/6184): 6%
+210 191 191 210 0
+Completed (501/6184): 8%
+305 196 196 305 0
+Completed (601/6184): 9%
+378 223 223 378 0
+Completed (701/6184): 11%
+424 277 277 423 1
+Completed (801/6184): 12%
+472 329 329 439 33
+Completed (901/6184): 14%
+515 386 386 468 47
+Completed (1001/6184): 16%
+556 445 445 501 55
+Completed (1101/6184): 17%
+564 537 537 504 60
+Completed (1201/6184): 19%
+642 559 559 552 90
+Completed (1301/6184): 21%
+716 585 585 603 113
+Completed (1401/6184): 22%
+816 585 585 623 193
+Completed (1501/6184): 24%
+911 590 590 643 268
+Completed (1601/6184): 25%
+986 615 615 717 269
+Completed (1701/6184): 27%
+1062 639 639 792 270
+Completed (1801/6184): 29%
+1162 639 639 892 270
+Completed (1901/6184): 30%
+1262 639 639 992 270
+Completed (2001/6184): 32%
+1362 639 639 1092 270
+Completed (2101/6184): 33%
+1462 639 639 1192 270
+Completed (2201/6184): 35%
+1562 639 639 1292 270
+Completed (2301/6184): 37%
+1662 639 639 1392 270
+Completed (2401/6184): 38%
+1745 656 656 1475 270
+Completed (2501/6184): 40%
+1770 731 731 1490 280
+Completed (2601/6184): 42%
+1869 732 732 1502 367
+Completed (2701/6184): 43%
+1969 732 732 1539 430
+Completed (2801/6184): 45%
+2069 732 732 1543 526
+Completed (2901/6184): 46%
+2169 732 732 1558 611
+Completed (3001/6184): 48%
+2269 732 732 1563 706
+Completed (3101/6184): 50%
+2368 733 733 1576 792
+Completed (3201/6184): 51%
+2468 733 733 1578 890
+Completed (3301/6184): 53%
+2567 734 734 1586 981
+Completed (3401/6184): 54%
+2667 734 734 1596 1071
+Completed (3501/6184): 56%
+2765 736 736 1603 1162
+Completed (3601/6184): 58%
+2863 738 738 1611 1252
+Completed (3701/6184): 59%
+2958 743 743 1620 1338
+Completed (3801/6184): 61%
+3058 743 743 1622 1436
+Completed (3901/6184): 63%
+3158 743 743 1622 1536
+Completed (4001/6184): 64%
+3258 743 743 1626 1632
+Completed (4101/6184): 66%
+3351 750 750 1628 1723
+Completed (4201/6184): 67%
+3451 750 750 1631 1820
+Completed (4301/6184): 69%
+3551 750 750 1639 1912
+Completed (4401/6184): 71%
+3649 752 752 1642 2007
+Completed (4501/6184): 72%
+3749 752 752 1652 2097
+Completed (4601/6184): 74%
+3841 760 760 1653 2188
+Completed (4701/6184): 76%
+3939 762 762 1657 2282
+Completed (4801/6184): 77%
+4039 762 762 1657 2382
+Completed (4901/6184): 79%
+4139 762 762 1657 2482
+Completed (5001/6184): 80%
+4239 762 762 1657 2582
+Completed (5101/6184): 82%
+4339 762 762 1657 2682
+Completed (5201/6184): 84%
+4439 762 762 1657 2782
+Completed (5301/6184): 85%
+4539 762 762 1657 2882
+Completed (5401/6184): 87%
+4639 762 762 1660 2979
+Completed (5501/6184): 88%
+4739 762 762 1660 3079
+Completed (5601/6184): 90%
+4839 762 762 1660 3179
+Completed (5701/6184): 92%
+4933 768 768 1667 3266
+Completed (5801/6184): 93%
+5033 768 768 1667 3366
+Completed (5901/6184): 95%
+5133 768 768 1674 3459
+Completed (6001/6184): 97%
+5214 787 787 1677 3537
+Completed (6101/6184): 98%
+5314 787 787 1677 3637
+Ran /home/anj/bitwiser/tools/bitwise-openjpeg-decompress-2.sh on src/test/resources/16px-photo-png-im-ppm-kdu.jp2
+Results compared to original file execution:
+ # mods causing expected exit code:   5381
+ # mods causing unexpected exit code: 803
+ # mods causing no output:            803
+ # mods causing identical output:     1680
+ # mods causing changed output:       3701
+Elapsed time:  691.611351013
