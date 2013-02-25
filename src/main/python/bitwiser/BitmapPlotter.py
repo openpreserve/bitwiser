@@ -30,6 +30,11 @@ def main():
         type="int", dest="size", default=256,
         help="Image width in pixels."
     )
+    parser.add_option(
+        "-n", "--namesuffix", action="store",
+        type="str", dest="suffix", default="",
+        help="Suffix for generated file names. Ignored if destination is specified."
+    )
     
     options, args = parser.parse_args()
     if len(args) not in [1, 2]:
