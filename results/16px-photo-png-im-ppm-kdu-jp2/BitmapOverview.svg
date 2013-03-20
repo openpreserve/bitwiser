@@ -27,7 +27,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
      inkscape:cx="457.12772"
-     inkscape:cy="495.81867"
+     inkscape:cy="895.81867"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -68,7 +68,10 @@
        height="140"
        x="43.125"
        y="-101.63783"
-       ry="0" />
+       ry="0"
+       inkscape:export-filename="/Users/andy/Documents/workspace/bitwiser/results/16px-photo-png-im-ppm-kdu-jp2/fig-bm-original.png"
+       inkscape:export-xdpi="149.95587"
+       inkscape:export-ydpi="149.95587" />
     <rect
        ry="0"
        y="478.36218"
@@ -76,7 +79,10 @@
        height="500"
        width="560"
        id="rect4163"
-       style="fill:#cccccc;fill-opacity:1;stroke:none" />
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/Users/andy/Documents/workspace/bitwiser/results/16px-photo-png-im-ppm-kdu-jp2/fig-bm-rendertools.png"
+       inkscape:export-xdpi="149.95587"
+       inkscape:export-ydpi="149.95587" />
     <rect
        style="fill:#cccccc;fill-opacity:1;stroke:none"
        id="rect4143"
@@ -84,7 +90,10 @@
        height="380"
        x="459.41016"
        y="78.362167"
-       ry="0" />
+       ry="0"
+       inkscape:export-filename="/Users/andy/Documents/workspace/bitwiser/results/16px-photo-png-im-ppm-kdu-jp2/fig-bm-validtools.png"
+       inkscape:export-xdpi="149.95587"
+       inkscape:export-ydpi="149.95587" />
     <rect
        ry="0"
        y="58.362183"
@@ -92,7 +101,10 @@
        height="620"
        width="400"
        id="rect4139"
-       style="fill:#cccccc;fill-opacity:1;stroke:none" />
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       inkscape:export-filename="/Users/andy/Documents/workspace/bitwiser/results/16px-photo-png-im-ppm-kdu-jp2/fig-bm-chartools.png"
+       inkscape:export-xdpi="149.95587"
+       inkscape:export-ydpi="149.95587" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot3786"
