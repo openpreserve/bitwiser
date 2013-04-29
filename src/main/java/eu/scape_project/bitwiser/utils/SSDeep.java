@@ -158,7 +158,7 @@ public class SSDeep {
 		  char[] p;
 	  long total_chars;
 	  int h, h2, h3;
-	  int j, n, i, k;
+	  int j, k;
 	  int block_size;
 	  char[] ret2 = new char[SPAMSUM_LENGTH/2 + 1];
 	}
@@ -257,8 +257,6 @@ public class SSDeep {
 	    return true;
 
 	  buffer = new byte[BUFFER_SIZE];
-	  if (buffer == null)
-	    return true;
 
 	  // snprintf(ctx.ret, 12, "%u:", ctx.block_size);
 	  ctx.ret.blocksize = ctx.block_size;
@@ -283,6 +281,7 @@ public class SSDeep {
 		  bytes_read = in.read(buffer);
 	      ss_engine(ctx,buffer,bytes_read);
 	  }
+	  in.close();
 
 	  if (ctx.h != 0) 
 	  {
@@ -300,15 +299,12 @@ public class SSDeep {
 	public FuzzyHash fuzzy_hash_file(File handle) throws IOException
 	{
 	  ss_context ctx;  
-	  int filepos;
 	  boolean done = false;
 	  
 	  if (null == handle)
 	    return null;
 	  
 	  ctx = new ss_context();
-	  if (ctx == null)
-	    return null;
 
 	  ss_init(ctx, handle);
 	  
@@ -346,7 +342,7 @@ public class SSDeep {
 	    return null;
 
 	  File handle = new File(filename);//,"rb");
-	  if (null == handle)
+	  if (!handle.exists())
 	    return null;
 
 	  return fuzzy_hash_file(handle);
