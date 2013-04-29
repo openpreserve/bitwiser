@@ -425,7 +425,7 @@ public class SSDeep {
 	  
 	  /* first compute the windowed rolling hash at each offset in
 	     the first string */
-	  for (i=0;s1[i] != 0;i++) 
+	  for (i=0;i < s1.length;i++) 
 	  {
 	    hashes[i] = roll_hash((char)s1[i]);
 	  }
@@ -438,7 +438,7 @@ public class SSDeep {
 	     for the first string. If one matches then we have a
 	     candidate substring match. We then confirm that match with
 	     a direct string comparison */
-	  for (i=0;s2[i] != 0;i++) {
+	  for (i=0;i < s2.length;i++) {
 	    long h = roll_hash((char)s2[i]);
 	    if (i < ROLLING_WINDOW-1) continue;
 	    for (j=ROLLING_WINDOW-1;j<num_hashes;j++) 
@@ -504,9 +504,11 @@ public class SSDeep {
 	  
 	  /* the two strings must have a common substring of length
 	     ROLLING_WINDOW to be candidates */
+	  /*
 	  if (has_common_substring(s1, s2) == 0) {
 	    return 0;
 	  }
+	  */
 	  
 	  /* compute the edit distance between the two strings. The edit distance gives
 	     us a pretty good idea of how closely related the two strings are */
@@ -565,11 +567,11 @@ public class SSDeep {
 	  // the same character like 'LLLLL'. Eliminate any sequences
 	  // longer than 3. This is especially important when combined
 	  // with the has_common_substring() test below. 
-	  s1_1 = eliminate_sequences(fh1.hash+1);
-	  s2_1 = eliminate_sequences(fh2.hash+1);
+	  s1_1 = eliminate_sequences(fh1.hash);
+	  s2_1 = eliminate_sequences(fh2.hash);
 	  
-	  s1_2 = eliminate_sequences(fh1.hash2+1);
-	  s2_2 = eliminate_sequences(fh1.hash2+1);
+	  s1_2 = eliminate_sequences(fh1.hash2);
+	  s2_2 = eliminate_sequences(fh1.hash2);
 	  
 	  // each signature has a string for two block sizes. We now
 	  // choose how to combine the two block sizes. We checked above
@@ -578,10 +580,10 @@ public class SSDeep {
 	    int score1, score2;
 	    score1 = score_strings(s1_1, s2_1, fh1.blocksize);
 	    score2 = score_strings(s1_2, s2_2, fh2.blocksize);
+	    
+	    //s.block_size = fh1.blocksize;
 
-	    //    s.block_size = fh1.blocksize;
-
-	    score = Math.max(score1, score2);
+	    score = Math.min(score1, score2);
 	  } else if (fh1.blocksize == fh2.blocksize*2) {
 
 	    score = score_strings(s1_1, s2_2, fh1.blocksize);
