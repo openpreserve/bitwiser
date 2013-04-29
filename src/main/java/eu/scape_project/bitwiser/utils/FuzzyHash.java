@@ -2,13 +2,13 @@ package eu.scape_project.bitwiser.utils;
 
 public class FuzzyHash { 
 	/** the blocksize used by the program, */
-	int blocksize;
+	protected int blocksize;
 	/** the hash for this blocksize */
-	String hash;
+	protected String hash;
 	/** the hash for twice the blocksize, */
-	String hash2;
+	protected String hash2;
 	/** the filename. */
-	String filename = null;
+	protected String filename = null;
 	
 	protected FuzzyHash() {
 	}
@@ -24,6 +24,36 @@ public class FuzzyHash {
 		// The raw output can contain NULLs, strip them out:
 		this.hash = hash.replaceAll("\0", "");
 		this.hash2 = hash2.replaceAll("\0", "");		
+	}
+	
+	/**
+	 * @return the blocksize
+	 */
+	public int getBlocksize() {
+		return blocksize;
+	}
+
+	/**
+	 * @return the hash
+	 */
+	public String getHash() {
+		this.clean();
+		return hash;
+	}
+
+	/**
+	 * @return the hash2
+	 */
+	public String getHash2() {
+		this.clean();
+		return hash2;
+	}
+
+	/**
+	 * @return the filename
+	 */
+	public String getFilename() {
+		return filename;
 	}
 
 	/* (non-Javadoc)
