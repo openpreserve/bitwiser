@@ -64,17 +64,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class SSDeep {
 	
-	public class FuzzyHash { 
-		/** the blocksize used by the program, */
-		int blocksize;
-		/** the hash for this blocksize */
-		String hash;
-		/** the hash for twice the blocksize, */
-		String hash2;
-		/** the filename. */
-		String filename;
-	}
-
 	/// Length of an individual fuzzy hash signature component
 	public static final int SPAMSUM_LENGTH = 64;
 	
@@ -164,8 +153,8 @@ public class SSDeep {
 	  return h;
 	}
 
-	class ss_context {
-		  char[] ret;
+	private class ss_context {
+		FuzzyHash ret;
 		  char[] p;
 	  long total_chars;
 	  int h, h2, h3;
@@ -175,22 +164,12 @@ public class SSDeep {
 	}
 
 
-	static void ss_destroy(ss_context ctx)
-	{
-	  if (ctx.ret != null)
-		  ctx.ret = null;
-		 //free(ctx.ret);
-	}
-
-
 	static boolean ss_init(ss_context ctx, File handle)
 	{
 	  if ( ctx == null )
 	    return true;
 
-	  ctx.ret = new char[FUZZY_MAX_RESULT];
-	  if (ctx.ret == null)
-	    return true;
+	  ctx.ret = new FuzzyHash();
 
 	  if (handle != null)
 	    ctx.total_chars = handle.length();
@@ -200,7 +179,7 @@ public class SSDeep {
 	    ctx.block_size = ctx.block_size * 2;
 	  }
 	  
-	  System.out.println("bs:"+ctx.block_size);
+	  //System.out.println("bs:"+ctx.block_size);
 
 	  return false;
 	}
@@ -224,7 +203,7 @@ public class SSDeep {
 	       element of the signature and reset both hashes
 	    */
 		  
-	    System.out.println(""+ctx.h+","+ctx.h2+","+ctx.h3);
+	    //System.out.println(""+ctx.h+","+ctx.h2+","+ctx.h3);
 	    ctx.h  = roll_hash(buffer[i]);// & 0x7FFFFFFF;
 	    ctx.h2 = sum_hash(buffer[i], ctx.h2);// & 0x7FFFFFFF;
 	    ctx.h3 = sum_hash(buffer[i], ctx.h3);// & 0x7FFFFFFF;
@@ -235,7 +214,7 @@ public class SSDeep {
 		 piece of the message between the last reset
 		 point and this one */
 	      ctx.p[ctx.j] = b64[(int)((ctx.h2&0xFFFF) % 64)];
-	      System.out.println("::"+ctx.j+":"+new String(ctx.p));
+	      //System.out.println("::"+ctx.j+":"+new String(ctx.p));
 //	      for( char c : ctx.p ) {
 //	    	  System.out.print(c);
 //	      }
@@ -282,7 +261,7 @@ public class SSDeep {
 	    return true;
 
 	  // snprintf(ctx.ret, 12, "%u:", ctx.block_size);
-	  ctx.ret = (ctx.block_size + ":").toCharArray();
+	  ctx.ret.blocksize = ctx.block_size;
 	  // ctx.p = ctx.ret + strlen(ctx.ret);  
 	  ctx.p = new char[SPAMSUM_LENGTH];
 	  
@@ -296,7 +275,7 @@ public class SSDeep {
 	  ctx.h  = 0;
 	  roll_reset();
 
-	  System.out.println("Opening file:"+handle);
+	  //System.out.println("Opening file:"+handle);
 	  FileInputStream in = new FileInputStream(handle);
 	  // while ((bytes_read = fread(buffer,sizeof(byte),BUFFER_SIZE,handle)) > 0)
 	  while (in.available() > 0 )
@@ -311,32 +290,29 @@ public class SSDeep {
 	    ctx.ret2[ctx.k] = b64[(int) ((ctx.h3 &0xFFFF) % 64)];
 	  }
 	  
-	//  strcat(ctx.p+ctx.j, ":");
-	//  strcat(ctx.p+ctx.j, ctx.ret2);
-	  ctx.ret = (new String(ctx.ret) + new String(ctx.p) + ":" + new String(ctx.ret2)).toCharArray();
+	  ctx.ret.hash = new String(ctx.p);
+	  ctx.ret.hash2 = new String(ctx.ret2);
 
-	//  free(buffer);
 	  return false;
 	}
 
 
-	boolean fuzzy_hash_file(File handle) throws IOException
+	public FuzzyHash fuzzy_hash_file(File handle) throws IOException
 	{
 	  ss_context ctx;  
 	  int filepos;
 	  boolean done = false;
 	  
 	  if (null == handle)
-	    return true;
+	    return null;
 	  
 	  ctx = new ss_context();
 	  if (ctx == null)
-	    return true;
-
-	//  filepos = ftello(handle);
+	    return null;
 
 	  ss_init(ctx, handle);
-	  System.out.println("bs-pre:"+ctx.block_size);
+	  
+	  ctx.ret.filename = handle.getPath();
 
 	  while (!done)
 	  {
@@ -345,7 +321,7 @@ public class SSDeep {
 
 	    ss_update(ctx,handle);
 	    
-		System.out.println("RESULT:"+new String(ctx.ret));
+		//System.out.println("RESULT:"+ctx.ret);
 
 	    // our blocksize guess may have been way off - repeat if necessary
 	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) 
@@ -354,54 +330,41 @@ public class SSDeep {
 	      done = true;
 	  }
 
-	  System.out.println("bs-post:"+ctx.block_size);
+	  //System.out.println("bs-post:"+ctx.block_size);
 	// strncpy(result,ctx.ret,FUZZY_MAX_RESULT);
 	  
-	  System.out.println("RESULT:"+new String(ctx.ret));
+	  //System.out.println("RESULT:"+ctx.ret);
 
-	  ss_destroy(ctx);
-	//  free(ctx);
-
-	//  if (fseeko(handle,filepos,SEEK_SET))
-	//      return true;
-
-	  return false;
+	  return ctx.ret;
 	}
 
 
-	public boolean fuzzy_hash_filename(String filename) throws IOException
+	public FuzzyHash fuzzy_hash_filename(String filename) throws IOException
 	{
-	  boolean status;
-
+		
 	  if (null == filename)
-	    return true;
+	    return null;
 
 	  File handle = new File(filename);//,"rb");
 	  if (null == handle)
-	    return true;
+	    return null;
 
-	  status = fuzzy_hash_file(handle);
-	  
-	//  fclose(handle);
-
-	  return status;
+	  return fuzzy_hash_file(handle);
 	}
 
 
-	boolean fuzzy_hash_buf(byte[] buf,
-			   int      buf_len,
-			   char[]          result)
+	FuzzyHash fuzzy_hash_buf(byte[] buf, int buf_len)
 	{
 	  ss_context ctx = new ss_context();
 	  boolean done = false;
 
 	  if (buf == null)
-	    return true;
+	    return null;
 
 	  ctx.total_chars = buf_len;
 	  ss_init(ctx, null);
 
-	  System.out.println("total_chars: "+ctx.total_chars);
+	  //System.out.println("total_chars: "+ctx.total_chars);
 
 	  while (!done)
 	  {
@@ -409,16 +372,10 @@ public class SSDeep {
 		//  ctx.p = ctx.ret + strlen(ctx.ret);
 		  ctx.p = new char[SPAMSUM_LENGTH+1]; // TODO Duplication!
 	    
-		//  memset(ctx.p, 0, SPAMSUM_LENGTH+1);
-		//  memset(ctx.ret2, 0, sizeof(ctx.ret2));
-	    
 	    ctx.k  = ctx.j  = 0;
 	    ctx.h3 = ctx.h2 = HASH_INIT;
 	    ctx.h  = 0;
 	    roll_reset();
-
-	    System.out.println("h:"+ctx.h);
-	    System.out.println("h2:"+ctx.h2);
 
 	    ss_engine(ctx,buf,buf_len);
 
@@ -428,35 +385,18 @@ public class SSDeep {
 	    else
 	      done = true;
 
-	    System.out.println("h:"+ctx.h);
-	    System.out.println("h2:"+ctx.h2);
-	    System.out.println("h3:"+ctx.h3);
-		  System.out.println("bs:"+ctx.block_size);
-		  System.out.println("ret:"+new String(ctx.ret));
-		  System.out.println("p:"+new String(ctx.p));
-		  System.out.println("ret2:"+new String(ctx.ret2));
 		    if (ctx.h != 0) 
 	      {
 		ctx.p[ctx.j] = b64[(int) ((ctx.h2&0xFFFF) % 64)];
 		ctx.ret2[ctx.k] = b64[(int) ((ctx.h3&0xFFFF) % 64)];
 	      }
 	    
-	 //  strcat(ctx.p+ctx.j, ":");
-	 //  strcat(ctx.p+ctx.j, ctx.ret2);
 	  }
 
 
-	//  strncpy(result,ctx.ret,FUZZY_MAX_RESULT);
-	  System.out.println("bs:"+ctx.block_size);
-	  System.out.println("ret:"+new String(ctx.ret));
-	  System.out.println("p:"+new String(ctx.p));
-	  System.out.println("ret2:"+new String(ctx.ret2));
-	  System.out.println("h3:"+ctx.h3);
-	  result = ctx.ret;
+	  ctx.ret = new FuzzyHash(ctx.block_size, String.valueOf(ctx.p), String.valueOf(ctx.ret2));
 
-	  ss_destroy(ctx);
-	//  free(ctx);
-	  return false;
+	  return ctx.ret;
 	}
 
 
@@ -655,19 +595,4 @@ public class SSDeep {
 	  return (int)score;
 	}
 
-	/**
-	 * Main class for quick testing.
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main( String[] args ) throws IOException {
-		SSDeep ssd = new SSDeep();
-		byte[] b2 = "Hello World how are you today...\n".getBytes();
-		byte[] b3 = "Helli".getBytes();
-		char[] h1 = null;
-		boolean t1 = ssd.fuzzy_hash_buf(b2, b2.length, h1);
-		System.out.println("Got "+h1);
-		ssd.fuzzy_hash_file(new File("test"));
-		//ssd.fuzzy_hash_file(new File("pom.xml"));
-	}
 }

@@ -1,0 +1,3 @@
+ssdeep,1.1--blocksize:hash:hash,filename
+48:98fXPWJi6+VvUjy6xO1/nPK2bW4zw4zBW5t9TeL:98fXPieUOkW/PjzBA4L,"/Users/andy/Documents/workspace/bitwiser/src/test/resources/ssdeep/lorem-cut.txt"
+48:98fXPWJi6+VvUjy6xO1/nPK2bW4zw4zBW5t9TeP4maXLPgtAGNbHV7dF2X4/IhBp:98fXPieUOkW/PjzBA4wR6DNbH1dF2I/Y,"/Users/andy/Documents/workspace/bitwiser/src/test/resources/ssdeep/lorem.txt"
