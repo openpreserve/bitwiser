@@ -1,0 +1,1 @@
+/Users/andy/Documents/workspace/bitwiser/src/test/resources/ssdeep/lorem.txt matches /Users/andy/Documents/workspace/bitwiser/src/test/resources/ssdeep/lorem-cut.txt (77)
