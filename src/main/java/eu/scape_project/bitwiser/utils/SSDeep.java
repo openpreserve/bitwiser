@@ -295,7 +295,12 @@ public class SSDeep {
 	  return false;
 	}
 
-
+	/**
+	 * 
+	 * @param handle
+	 * @return
+	 * @throws IOException
+	 */
 	public FuzzyHash fuzzy_hash_file(File handle) throws IOException
 	{
 	  ss_context ctx;  
@@ -334,7 +339,12 @@ public class SSDeep {
 	  return ctx.ret;
 	}
 
-
+	/**
+	 * 
+	 * @param filename
+	 * @return
+	 * @throws IOException
+	 */
 	public FuzzyHash fuzzy_hash_filename(String filename) throws IOException
 	{
 		
@@ -349,7 +359,7 @@ public class SSDeep {
 	}
 
 
-	FuzzyHash fuzzy_hash_buf(byte[] buf, int buf_len)
+	public FuzzyHash fuzzy_hash_buf(byte[] buf, int buf_len)
 	{
 	  ss_context ctx = new ss_context();
 	  boolean done = false;
@@ -395,8 +405,14 @@ public class SSDeep {
 	  return ctx.ret;
 	}
 
-
-
+	/**
+	 * 
+	 * @param buf
+	 * @return
+	 */
+	public FuzzyHash fuzzy_hash_buf(byte[] buf) {
+		return this.fuzzy_hash_buf(buf, buf.length);
+	}
 
 	/* 
 	   we only accept a match if we have at least one common substring in

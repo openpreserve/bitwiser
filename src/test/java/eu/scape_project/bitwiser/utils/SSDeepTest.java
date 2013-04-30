@@ -36,7 +36,7 @@ public class SSDeepTest {
 	@Test
 	public void testFuzzy_hash_buf() {
 		SSDeep ssd = new SSDeep();
-		FuzzyHash h = ssd.fuzzy_hash_buf(b2, b2.length);
+		FuzzyHash h = ssd.fuzzy_hash_buf(b2);
 		String expected = "3:aAVFUrPgbn:aAvgIn";
 		String result = h.toString();
 		assertEquals("Buffer-based ssdeep failed!", expected, result );
