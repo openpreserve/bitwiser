@@ -1,6 +1,6 @@
-/target
-/.settings
-/.classpath
+target
+.settings
+.classpath
 
 # Java specific
 *.class
