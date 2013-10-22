@@ -19,6 +19,7 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+	<inceptionYear>2010</inceptionYear>
 	<developers>
 		<developer>
 			<id>anjackson</id>
@@ -26,6 +27,10 @@
 			<email>Andrew.Jackson@bl.uk</email>
 		</developer>
 	</developers>
+	<organization>
+		<name>SCAPE Consortium</name>
+		<url>http://scape-project.eu</url>
+	</organization>
 	<issueManagement>
 		<system>GitHub Issues</system>
 		<url>https://github.com/openplanets/bitwiser/issues</url>
@@ -42,6 +47,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.6</jdk.version>
+		<maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
 	</properties>
 	<build>
 		<resources>
@@ -94,9 +100,10 @@
 					<strictCheck>true</strictCheck>
 					<failIfMissing>true</failIfMissing>
 					<properties>
-						<owner>SCAPE Constortium</owner>
-						<year>2010</year>
-						<email>project.office@gmail.com</email>
+						<holder>${project.organization.name}</holder>
+						<year>${project.inceptionYear} - ${maven.build.timestamp}</year>
+						<contact>office@scape-project.eu</contact>
+						<name>${project.name}</name>
 					</properties>
 					<excludes>
 						<exclude>**/README</exclude>
