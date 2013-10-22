@@ -8,3 +8,4 @@ before_script:
  - "ulimit -a"
  - "ulimit -u 2048"
  - "ulimit -a"
+ - cd bitwiser-core
