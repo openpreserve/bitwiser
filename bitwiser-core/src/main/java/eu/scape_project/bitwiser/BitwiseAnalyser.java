@@ -3,13 +3,11 @@
  */
 package eu.scape_project.bitwiser;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutionException;
@@ -81,8 +79,6 @@ public class BitwiseAnalyser {
         System.out.println("Truth is "+truth);
         String result = "";
         int clears = 0;
-        int errors = 0;
-        int warnings = 0;
         int count = 0;
         long len = tempFile.length();
         System.out.println("File length: "+len);
