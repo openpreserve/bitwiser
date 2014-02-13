@@ -66,9 +66,13 @@ public class BitwiseAnalyser {
     private static final String FILE_EXT	= ".tif";
 
     public static void main(String [] args) throws IOException {
-        File sourceFile = new File(DATA_DIR+FILE+FILE_EXT);		//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
-        File tempFile = new File(DATA_DIR+FILE+".tmp"+FILE_EXT);	//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
-        File outputFile = new File(DATA_DIR+FILE+".jp2");		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
+    	String inFile  = DATA_DIR+FILE+FILE_EXT;
+    	String tFile   = DATA_DIR+FILE+".tmp"+FILE_EXT;
+    	String outFile = DATA_DIR+FILE+".jp2";
+    	
+        File sourceFile = new File(inFile);			//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
+        File tempFile = new File(tFile);			//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
+        File outputFile = new File(outFile);		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
         copy(sourceFile,tempFile);
         
         // Entropy Calc:
@@ -192,12 +196,12 @@ public class BitwiseAnalyser {
 			while ((len = in.read(buf)) >= 0) {
 				if( len > 0 ) out.write(buf, 0, len);
 			}
+			out.flush();
     	} finally {
     		if (in!=null){
     			in.close();
     		}
     		if (out!=null){
-				out.flush();
 				out.close();
     		}
     	}
