@@ -393,8 +393,16 @@ Monte Carlo value for Pi is 2.961740435 (error 5.72 percent).
 Serial correlation coefficient is -0.135723 (totally uncorrelated = 0.0).
      */
     
+    private static final String DEFAULT_TMP = "/Users/anj/temp.rnd";
+    
     public static void main(String [] args) throws IOException {
-    	String tmpFile = "/Users/anj/temp.rnd";
+    	String tmpFile = "";
+    	if (args.length==2){
+	    	tmpFile = args[1];
+    	} else {
+    		tmpFile = DEFAULT_TMP;
+    	}
+    	
         File tempFile = new File(tmpFile);
         makeRandomFile(tempFile);
         Entropy ent = new Entropy();
