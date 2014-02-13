@@ -27,19 +27,21 @@ public class SimHash<T> {
 	public static <T> SimHash<T> build(List<T> dimensions){
 		Hashing<T> hashing = new Hashing<T>(){
 			public BitSet hashing(T t) {
+				BitSet ret = null;
+				
 				String key = t.toString();
 				byte[] bytes = null;
 				try {
 					MessageDigest md = MessageDigest.getInstance("MD5");
 					bytes = md.digest(key.getBytes());
+					
+					ret = new BitSet(bytes.length*8);
+					for(int k=0; k<bytes.length*8; k++){
+						if(bitTest(bytes,k))
+							ret.set(k);
+					}
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
-				}
-
-				BitSet ret = new BitSet(bytes.length*8);
-				for(int k=0; k<bytes.length*8; k++){
-					if(bitTest(bytes,k))
-						ret.set(k);
 				}
 
 				return ret;

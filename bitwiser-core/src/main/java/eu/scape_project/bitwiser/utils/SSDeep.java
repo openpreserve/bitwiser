@@ -450,15 +450,15 @@ public class SSDeep {
 	     for the first string. If one matches then we have a
 	     candidate substring match. We then confirm that match with
 	     a direct string comparison */
-	  for (i=0;i < s2.length;i++) {
+	  /*for (i=0;i < s2.length;i++) {
 	    long h = roll_hash((char)s2[i]);
 	    if (i < ROLLING_WINDOW-1) continue;
 	    for (j=ROLLING_WINDOW-1;j<num_hashes;j++) 
 	    {
 	      if (hashes[j] != 0 && hashes[j] == h) 
 	      {
-		/* we have a potential match - confirm it */
-	    	  /*FIXME
+		// we have a potential match - confirm it
+	   	//FIXME
 		if (strlen(s2+i-(ROLLING_WINDOW-1)) >= ROLLING_WINDOW && 
 		    strncmp(s2+i-(ROLLING_WINDOW-1), 
 			    s1+j-(ROLLING_WINDOW-1), 
@@ -466,10 +466,10 @@ public class SSDeep {
 		{
 		  return 1;
 		}
-		*/
+		
 	      }
 	    }
-	  }
+	  }*/
 	  
 	  return 0;
 	}

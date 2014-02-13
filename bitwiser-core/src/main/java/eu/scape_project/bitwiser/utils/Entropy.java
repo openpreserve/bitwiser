@@ -77,8 +77,8 @@ public class Entropy {
 
         sccfirst = true;           /* Mark first time for serial correlation */
         scct1 = scct2 = scct3 = 0.0; /* Clear serial correlation terms */
-
-        incirc = Math.pow(Math.pow(256.0, (double) (MONTEN / 2)) - 1, 2.0);
+        
+        incirc = Math.pow(Math.pow(256.0, (MONTEN / 2d)) - 1, 2.0);
 
         for (i = 0; i < 256; i++) {
             ccount[i] = 0;
@@ -288,7 +288,7 @@ public class Entropy {
                             ccount[i], ((double) ccount[i] / totalc));
                 } else {
                     if (ccount[i] > 0) {
-                        System.out.printf("%3d   %c   %10ld   %f\n", i,
+                        System.out.printf("%3d   %c   %10d   %f\n", i,
                                 /* The following expression shows ISO 8859-1
                   Latin1 characters and blanks out other codes.
                   The test for ISO space replaces the ISO
@@ -303,7 +303,7 @@ public class Entropy {
                 }
             }
             if (!terse) {
-                System.out.printf("\nTotal:    %10ld   %f\n\n", totalc, 1.0);
+                System.out.printf("\nTotal:    %10d   %f\n\n", totalc, 1.0);
             }
         }
 
@@ -393,8 +393,10 @@ Monte Carlo value for Pi is 2.961740435 (error 5.72 percent).
 Serial correlation coefficient is -0.135723 (totally uncorrelated = 0.0).
      */
     
+    private static final String tmpFile = "/Users/anj/temp.rnd";
+    
     public static void main(String [] args) throws IOException {
-        File tempFile = new File("/Users/anj/temp.rnd");
+        File tempFile = new File(tmpFile);
         makeRandomFile(tempFile);
         Entropy ent = new Entropy();
         System.out.println("Starting entropy calc...");

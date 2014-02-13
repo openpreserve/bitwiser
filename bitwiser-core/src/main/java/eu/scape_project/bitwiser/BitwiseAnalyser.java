@@ -59,13 +59,16 @@ public class BitwiseAnalyser {
         NONE
     }
     
-    private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert";
+    private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.8.8-Q16/convert";
     private static final String DATA_DIR	= "C:/Projects/SCAPE/BitWiser/Data/";
+    
+    private static final String FILE		= "fig-bm-original";
+    private static final String FILE_EXT	= ".tif";
 
     public static void main(String [] args) throws IOException {
-        File sourceFile = new File(DATA_DIR+"02c440f.tif");		//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
-        File tempFile = new File(DATA_DIR+"02c440f.tmp.tif");	//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
-        File outputFile = new File(DATA_DIR+"02c440f.jp2");		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
+        File sourceFile = new File(DATA_DIR+FILE+FILE_EXT);		//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
+        File tempFile = new File(DATA_DIR+FILE+".tmp"+FILE_EXT);	//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
+        File outputFile = new File(DATA_DIR+FILE+".jp2");		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
         copy(sourceFile,tempFile);
         
         // Entropy Calc:
@@ -176,17 +179,27 @@ public class BitwiseAnalyser {
     }
     
     static void copy(File src, File dst) throws IOException {
-     InputStream in = new FileInputStream(src);
-     OutputStream out = new FileOutputStream(dst);
-
-     // Transfer bytes from in to out
-     byte[] buf = new byte[1024];
-     int len;
-     while ((len = in.read(buf)) >= 0) {
-         if( len > 0 ) out.write(buf, 0, len);
-     }
-     in.close();
-     out.flush();
-     out.close();
-    }
+    	InputStream in = null;
+    	OutputStream out = null;
+    	
+    	try{
+    		in = new FileInputStream(src);
+    		out = new FileOutputStream(dst);
+    	
+			// Transfer bytes from in to out
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) >= 0) {
+				if( len > 0 ) out.write(buf, 0, len);
+			}
+    	} finally {
+    		if (in!=null){
+    			in.close();
+    		}
+    		if (out!=null){
+				out.flush();
+				out.close();
+    		}
+    	}
+	}
 }
