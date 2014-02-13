@@ -61,14 +61,29 @@ public class BitwiseAnalyser {
     
     private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.8.8-Q16/convert";
     private static final String DATA_DIR	= "C:/Projects/SCAPE/BitWiser/Data/";
-    
-    private static final String FILE		= "fig-bm-original";
-    private static final String FILE_EXT	= ".tif";
 
     public static void main(String [] args) throws IOException {
-    	String inFile  = DATA_DIR+FILE+FILE_EXT;
-    	String tFile   = DATA_DIR+FILE+".tmp"+FILE_EXT;
-    	String outFile = DATA_DIR+FILE+".jp2";
+    	String inFile   = null;
+    	String tFile    = null;
+    	String outFile  = null;
+    	String ext		= null;
+    	
+    	if (args.length!=2){
+    		ext		= args[0].substring(args[0].lastIndexOf('.'));
+    		inFile  = args[0];
+    		tFile   = inFile.substring(0, inFile.lastIndexOf('.'))+".tmp"+ext;
+    		outFile = inFile.substring(0, inFile.lastIndexOf('.'))+".jp2";
+    		
+    		process(inFile, tFile, outFile);
+    	} else {
+    		System.out.println("Usage: java BitwiseAnalyser <file path>");
+    	}
+    }
+    
+    private static void process(String inFile, String tFile, String outFile) throws IOException {
+    	if(inFile==null || tFile==null || outFile==null ){
+    		return;
+    	}
     	
         File sourceFile = new File(inFile);			//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
         File tempFile = new File(tFile);			//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
