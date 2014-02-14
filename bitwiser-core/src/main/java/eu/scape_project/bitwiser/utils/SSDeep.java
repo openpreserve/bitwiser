@@ -406,8 +406,7 @@ public class SSDeep {
 	*/
 	static int hasCommonSubstring(char[] s1, char[] s2)
 	{
-	  int i, j;
-	  int numHashes;
+	  int i;
 	  long[] hashes = new long[SPAMSUM_LENGTH];
 	  
 	  /* there are many possible algorithms for common substring
@@ -422,7 +421,6 @@ public class SSDeep {
 	  {
 	    hashes[i] = rollHash((char)s1[i]);
 	  }
-	  numHashes = i;
 	  
 	  rollReset();
 	  

@@ -103,8 +103,6 @@ public class BitwiseAnalyser {
         System.out.println("Truth is "+truth);
         String result = "";
         int clears = 0;
-        int errors = 0;
-        int warnings = 0;
         int count = 0;
         long len = tempFile.length();
         System.out.println("File length: "+len);
