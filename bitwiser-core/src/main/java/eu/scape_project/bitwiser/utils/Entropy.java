@@ -28,11 +28,11 @@ public class Entropy {
 
      */
 
-    boolean binary = false;     /* Treat input as a bitstream */
+    private boolean binary = false;     /* Treat input as a bitstream */
 
-    long ccount[] = new long[256],       /* Bins to count occurrences of values */
-    totalc = 0;        /* Total bytes counted */
-    double prob[] = new double[256];       /* Probabilities per bin for entropy */
+    private long ccount[] = new long[256],       /* Bins to count occurrences of values */
+    						totalc = 0;        /* Total bytes counted */
+    private double prob[] = new double[256];       /* Probabilities per bin for entropy */
 
     /*  RT_LOG2  --  Calculate log to the base 2  */
 
@@ -41,16 +41,16 @@ public class Entropy {
         return Math.log(x)/Math.log(2.0);
     }
 
-    static int MONTEN = 6;             /* Bytes used as Monte Carlo
+    private static int MONTEN = 6;             /* Bytes used as Monte Carlo
                     co-ordinates.  This should be no more
                     bits than the mantissa of your
                                         "double" floating point type. */
 
-    int mp;
-    boolean sccfirst;
-    long monte[] = new long[MONTEN];
-    long inmont, mcount;
-    double cexp, incirc, montex, montey, montepi,
+    private int mp;
+    private boolean sccfirst;
+    private long monte[] = new long[MONTEN];
+    private long inmont, mcount;
+    private double cexp, incirc, montex, montey, montepi,
     scc, sccun, sccu0, scclast, scct1, scct2, scct3,
     ent, chisq, datasum, mean;
 
@@ -342,7 +342,7 @@ public class Entropy {
     }
 
     /* For the chi-squared cheat? */
-    double[][] chsqt= {
+    private double[][] chsqt= {
             {
                 0.5,
                 0.25,
