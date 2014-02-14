@@ -36,7 +36,7 @@ public class Entropy {
 
     /*  RT_LOG2  --  Calculate log to the base 2  */
 
-    static double rt_log2(double x)
+    static double rtLog2(double x)
     {
         return Math.log(x)/Math.log(2.0);
     }
@@ -58,7 +58,7 @@ public class Entropy {
 
     public Entropy() { }
 
-    void rt_init(boolean binmode)
+    void rtInit(boolean binmode)
     {
         int i;
 
@@ -88,7 +88,7 @@ public class Entropy {
 
     /*  RT_ADD  --  Add one or more bytes to accumulation.  */
 
-    void rt_add(int[] ocb, int bufl)
+    void rtAdd(int[] ocb, int bufl)
     {
         int oc, c, bean;
 
@@ -146,7 +146,7 @@ public class Entropy {
 
     /*  RT_END  --  Complete calculation and return results.  */
 
-    void rt_end()
+    void rtEnd()
     {
         int i;
 
@@ -180,7 +180,7 @@ public class Entropy {
 
         for (i = 0; i < (binary ? 2 : 256); i++) {
             if (prob[i] > 0.0) {
-                ent += prob[i] * rt_log2(1 / prob[i]);
+                ent += prob[i] * rtLog2(1 / prob[i]);
             }
         }
 
@@ -189,9 +189,9 @@ public class Entropy {
 
         montepi = 4.0 * (((double) inmont) / mcount);
 
-        System.out.printf("0,File-%ss,Entropy,Chi-square,Mean,Monte-Carlo-Pi,Serial-Correlation\n",
+        System.out.printf("0,File-%ss,Entropy,Chi-square,Mean,Monte-Carlo-Pi,Serial-Correlation%n",
                 binary ? "bit" : "byte");
-        System.out.printf("1,%d,%f,%f,%f,%f,%f\n",
+        System.out.printf("1,%d,%f,%f,%f,%f,%f%n",
                 totalc, ent, chisq, datasum/totalc, montepi, scc);
         /* Return results through arguments */
         mean = datasum/totalc;
@@ -212,7 +212,7 @@ public class Entropy {
 
         /* Initialise for calculations */
         System.out.println("Initialise...");
-        rt_init(binary);
+        rtInit(binary);
 
         /* Scan input file and count character occurrences */
         System.out.println("Scan file... "+file.length());
@@ -239,7 +239,7 @@ public class Entropy {
                 } else {
                     ccount[ocb[0]]++;         /* Update counter for this bin */
                 }
-                rt_add(ocb, 1);
+                rtAdd(ocb, 1);
             }
         } catch( EOFException e ) {
              // File ended, which is fine. Surely this should not be an Exception?!
@@ -250,12 +250,12 @@ public class Entropy {
 
         /* Complete calculation and return sequence metrics */
         double chip;
-        rt_end();
+        rtEnd();
 
         if (terse) {
-            System.out.printf("0,File-%ss,Entropy,Chi-square,Mean,Monte-Carlo-Pi,Serial-Correlation\n",
+            System.out.printf("0,File-%ss,Entropy,Chi-square,Mean,Monte-Carlo-Pi,Serial-Correlation%n",
                     binary ? "bit" : "byte");
-            System.out.printf("1,%d,%f,%f,%f,%f,%f\n",
+            System.out.printf("1,%d,%f,%f,%f,%f,%f%n",
                     totalc, ent, chisq, mean, montepi, scc);
         }
 
@@ -278,17 +278,17 @@ public class Entropy {
 
         if (counts) {
             if (terse) {
-                System.out.printf("2,Value,Occurrences,Fraction\n");
+                System.out.printf("2,Value,Occurrences,Fraction%n");
             } else {
-                System.out.printf("Value Char Occurrences Fraction\n");
+                System.out.printf("Value Char Occurrences Fraction%n");
             }
             for (byte i = 0; i < (binary ? 2 : 256); i++) {
                 if (terse) {
-                    System.out.printf("3,%d,%d,%f\n", i,
+                    System.out.printf("3,%d,%d,%f%n", i,
                             ccount[i], ((double) ccount[i] / totalc));
                 } else {
                     if (ccount[i] > 0) {
-                        System.out.printf("%3d   %c   %10d   %f\n", i,
+                        System.out.printf("%3d   %c   %10d   %f%n", i,
                                 /* The following expression shows ISO 8859-1
                   Latin1 characters and blanks out other codes.
                   The test for ISO space replaces the ISO
@@ -303,39 +303,39 @@ public class Entropy {
                 }
             }
             if (!terse) {
-                System.out.printf("\nTotal:    %10d   %f\n\n", totalc, 1.0);
+                System.out.printf("%nTotal:    %10d   %f%n%n", totalc, 1.0);
             }
         }
 
         /* Print calculated results */
 
         if (!terse) {
-            System.out.printf("Entropy = %f bits per %s.\n", ent, samp);
-            System.out.printf("\nOptimum compression would reduce the size\n");
-            System.out.printf("of this %d %s file by %d percent.\n\n", totalc, samp,
+            System.out.printf("Entropy = %f bits per %s.%n", ent, samp);
+            System.out.printf("%nOptimum compression would reduce the size%n");
+            System.out.printf("of this %d %s file by %d percent.%n%n", totalc, samp,
                     (short) ((100 * ((binary ? 1 : 8) - ent) /
                             (binary ? 1.0 : 8.0))));
             System.out.printf(
-                    "Chi square distribution for %d samples is %1.2f, and randomly\n",
+                    "Chi square distribution for %d samples is %1.2f, and randomly%n",
                     totalc, chisq);
             if (chip < 0.0001) {
-                System.out.printf("would exceed this value less than 0.01 percent of the times.\n\n");
+                System.out.printf("would exceed this value less than 0.01 percent of the times.%n%n");
             } else if (chip > 0.9999) {
-                System.out.printf("would exceed this value more than than 99.99 percent of the times.\n\n");
+                System.out.printf("would exceed this value more than than 99.99 percent of the times.%n%n");
             } else {
-                System.out.printf("would exceed this value %1.2f percent of the times.\n\n",
+                System.out.printf("would exceed this value %1.2f percent of the times.%n%n",
                         chip * 100);
             }
             System.out.printf(
-                    "Arithmetic mean value of data %ss is %1.4f (%.1f = random).\n",
+                    "Arithmetic mean value of data %ss is %1.4f (%.1f = random).%n",
                     samp, mean, binary ? 0.5 : 127.5);
-            System.out.printf("Monte Carlo value for Pi is %1.9f (error %1.2f percent).\n",
+            System.out.printf("Monte Carlo value for Pi is %1.9f (error %1.2f percent).%n",
                     montepi, 100.0 * (Math.abs(Math.PI - montepi) / Math.PI));
             System.out.printf("Serial correlation coefficient is ");
             if (scc >= -99999) {
-                System.out.printf("%1.6f (totally uncorrelated = 0.0).\n", scc);
+                System.out.printf("%1.6f (totally uncorrelated = 0.0).%n", scc);
             } else {
-                System.out.printf("undefined (all values equal!).\n");
+                System.out.printf("undefined (all values equal!).%n");
             }
         }
 
