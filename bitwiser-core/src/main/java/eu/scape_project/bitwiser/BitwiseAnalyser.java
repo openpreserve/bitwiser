@@ -4,6 +4,7 @@
 package eu.scape_project.bitwiser;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -213,12 +214,20 @@ public class BitwiseAnalyser {
 			}
 			out.flush();
     	} finally {
-    		if (in!=null){
-    			in.close();
-    		}
-    		if (out!=null){
-				out.close();
-    		}
+    		close(in);
+    		close(out);
     	}
 	}
+    
+    private static void close(Closeable c) {
+        if (c==null) {
+        	return; 
+        }
+        
+        try {
+            c.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+     }
 }
