@@ -85,7 +85,7 @@ public class SSDeep {
 	  int h1, h2, h3;
 	  int n;
 	}
-	private static roll_state_class roll_state = new roll_state_class();
+	private static roll_state_class rollState = new roll_state_class();
 
 
 	/*
@@ -101,28 +101,28 @@ public class SSDeep {
 	static int rollHash(int c)
 	{
 		
-	  roll_state.h2 -= roll_state.h1;
+	  rollState.h2 -= rollState.h1;
 	  //roll_state.h2 = roll_state.h2 & 0x7fffffff
-	  roll_state.h2 += ROLLING_WINDOW * c;
+	  rollState.h2 += ROLLING_WINDOW * c;
 	  //roll_state.h2 = roll_state.h2 & 0x7fffffff
 	  
-	  roll_state.h1 += c;
+	  rollState.h1 += c;
 	  //roll_state.h1 = roll_state.h1 & 0x7fffffff
-	  roll_state.h1 -= roll_state.window[(roll_state.n % ROLLING_WINDOW)];
+	  rollState.h1 -= rollState.window[(rollState.n % ROLLING_WINDOW)];
 	  //roll_state.h1 = roll_state.h1 & 0x7fffffff
 	  
-	  roll_state.window[roll_state.n % ROLLING_WINDOW] = (char)c;
-	  roll_state.n = (roll_state.n+1)%ROLLING_WINDOW;
+	  rollState.window[rollState.n % ROLLING_WINDOW] = (char)c;
+	  rollState.n = (rollState.n+1)%ROLLING_WINDOW;
 	  
 	  /* The original spamsum AND'ed this value with 0xFFFFFFFF which
 	     in theory should have no effect. This AND has been removed 
 	     for performance (jk) */
-	  roll_state.h3 = (roll_state.h3 << 5);
-	  roll_state.h3 ^= c;
+	  rollState.h3 = (rollState.h3 << 5);
+	  rollState.h3 ^= c;
 	  //roll_state.h3 = roll_state.h3 & 0x7FFFFFFF
 	  //if( roll_state.h3 > 0xEFFFFFFF ) roll_state.h3 -= 0xEFFFFFFF
 	  
-	  long result = ((roll_state.h1 + roll_state.h2 + roll_state.h3));//&0x7FFFFFFF
+	  long result = ((rollState.h1 + rollState.h2 + rollState.h3));//&0x7FFFFFFF
 	  
 	  return (int) result;
 	}
@@ -132,11 +132,11 @@ public class SSDeep {
 	*/
 	static void rollReset()
 	{	
-		  roll_state.h1 = 0;
-		  roll_state.h2 = 0;
-		  roll_state.h3 = 0;
-		  roll_state.n = 0;
-		  Arrays.fill(roll_state.window,(char)0);
+		  rollState.h1 = 0;
+		  rollState.h2 = 0;
+		  rollState.h3 = 0;
+		  rollState.n = 0;
+		  Arrays.fill(rollState.window,(char)0);
 	}
 
 	/* a simple non-rolling hash, based on the FNV hash */

@@ -61,7 +61,6 @@ public class BitwiseAnalyser {
     }
     
     private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.8.8-Q16/convert";
-    private static final String DATA_DIR	= "C:/Projects/SCAPE/BitWiser/Data/";
 
     public static void main(String [] args) throws IOException {
     	String inFile   = null;

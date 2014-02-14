@@ -41,7 +41,7 @@ public class Entropy {
         return Math.log(x)/Math.log(2.0);
     }
 
-    private static int MONTEN = 6;             /* Bytes used as Monte Carlo
+    private static final int MONTEN = 6;             /* Bytes used as Monte Carlo
                     co-ordinates.  This should be no more
                     bits than the mantissa of your
                                         "double" floating point type. */
