@@ -208,7 +208,7 @@ public class Entropy {
 
     public void calculate( File file, boolean  counts, boolean fold, boolean binary, boolean terse  ) throws IOException {
         String samp = binary ? "bit" : "byte";
-        //memset(ccount, 0, sizeof ccount);
+        // memset(ccount, 0, sizeof ccount)
 
         /* Initialise for calculations */
         System.out.println("Initialise...");
@@ -262,7 +262,7 @@ public class Entropy {
         /* Calculate probability of observed distribution occurring from
            the results of the Chi-Square test */
 
-        //chip = pochisq(chisq, (binary ? 1 : 255));
+        // chip = pochisq(chisq, (binary ? 1 : 255))
         // FIXME Is this a Cheat?
         chip = Math.sqrt(2.0 * chisq) - Math.sqrt(2.0 * (binary ? 1 : 255.0) - 1.0);
         double a = Math.abs(chip);

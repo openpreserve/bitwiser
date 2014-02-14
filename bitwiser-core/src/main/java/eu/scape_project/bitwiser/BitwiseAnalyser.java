@@ -86,16 +86,15 @@ public class BitwiseAnalyser {
     		return;
     	}
     	
-        File sourceFile = new File(inFile);			//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
-        File tempFile = new File(tFile);			//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
-        File outputFile = new File(outFile);		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
+        File sourceFile = new File(inFile);
+        File tempFile = new File(tFile);
+        File outputFile = new File(outFile);
         copy(sourceFile,tempFile);
         
         // Entropy Calc:
         Entropy ent = new Entropy();
         System.out.println("Starting entropy calc...");
         ent.calculate(tempFile, false, false, false, false);
-        //System.exit(0);
         
         // Start munging...
         System.out.println("Start bit-flipping...");
@@ -149,7 +148,6 @@ public class BitwiseAnalyser {
     }
     
     static String runCommand( File tempFile, File outputFile ) throws IOException {
-//        String[] commands = new String[]{"file", tempFile.getAbsolutePath() };
         outputFile.delete();
         String[] commands = new String[]{CMD_CONVERT, tempFile.getAbsolutePath(), outputFile.getAbsolutePath() };
                 
