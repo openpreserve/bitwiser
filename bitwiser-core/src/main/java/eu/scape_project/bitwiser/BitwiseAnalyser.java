@@ -158,8 +158,8 @@ public class BitwiseAnalyser {
         Process child = pb.start();
         
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<String> ftr_stdout = executor.submit(new StreamReader(child.getInputStream()));
-        Future<String> ftr_stderr = executor.submit(new StreamReader(child.getErrorStream()));
+        Future<String> ftrStdOut = executor.submit(new StreamReader(child.getInputStream()));
+        Future<String> ftrStdErr = executor.submit(new StreamReader(child.getErrorStream()));
         
         try {
             child.waitFor();
@@ -173,8 +173,8 @@ public class BitwiseAnalyser {
         String stdout = "";
         String stderr = "";
         try {
-			stdout = ftr_stdout.get();
-			stderr = ftr_stderr.get();
+			stdout = ftrStdOut.get();
+			stderr = ftrStdErr.get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

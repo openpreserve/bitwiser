@@ -242,7 +242,7 @@ public class SSDeep {
 
 	static boolean ssUpdate(ss_context ctx, File handle) throws IOException
 	{
-	  int bytes_read = 0;
+	  int bytesRead = 0;
 	  byte[] buffer; 
 
 	  if (null == ctx || null == handle) {
@@ -269,8 +269,8 @@ public class SSDeep {
 	  // while ((bytes_read = fread(buffer,sizeof(byte),BUFFER_SIZE,handle)) > 0)
 	  while (in.available() > 0 )
 	  {
-		  bytes_read = in.read(buffer);
-	      ssEngine(ctx,buffer,bytes_read);
+		  bytesRead = in.read(buffer);
+	      ssEngine(ctx,buffer,bytesRead);
 	  }
 	  in.close();
 
@@ -407,7 +407,7 @@ public class SSDeep {
 	static int hasCommonSubstring(char[] s1, char[] s2)
 	{
 	  int i, j;
-	  int num_hashes;
+	  int numHashes;
 	  long[] hashes = new long[SPAMSUM_LENGTH];
 	  
 	  /* there are many possible algorithms for common substring
@@ -422,7 +422,7 @@ public class SSDeep {
 	  {
 	    hashes[i] = rollHash((char)s1[i]);
 	  }
-	  num_hashes = i;
+	  numHashes = i;
 	  
 	  rollReset();
 	  
@@ -546,8 +546,8 @@ public class SSDeep {
 	int fuzzyCompare(FuzzyHash fh1, FuzzyHash fh2 )
 	{
 	  int score = 0;
-	  char[] s1_1, s1_2;
-	  char[] s2_1, s2_2;
+	  char[] s11, s12;
+	  char[] s21, s22;
 	  
 	  // if the blocksizes don't match then we are comparing
 	  // apples to oranges. This isn't an 'error' per se. We could
@@ -562,27 +562,27 @@ public class SSDeep {
 	  // the same character like 'LLLLL'. Eliminate any sequences
 	  // longer than 3. This is especially important when combined
 	  // with the has_common_substring() test below. 
-	  s1_1 = eliminateSequences(fh1.hash);
-	  s2_1 = eliminateSequences(fh2.hash);
+	  s11 = eliminateSequences(fh1.hash);
+	  s21 = eliminateSequences(fh2.hash);
 	  
-	  s1_2 = eliminateSequences(fh1.hash2);
-	  s2_2 = eliminateSequences(fh1.hash2);
+	  s12 = eliminateSequences(fh1.hash2);
+	  s22 = eliminateSequences(fh1.hash2);
 	  
 	  // each signature has a string for two block sizes. We now
 	  // choose how to combine the two block sizes. We checked above
 	  // that they have at least one block size in common 
 	  if (fh1.blocksize == fh2.blocksize) {
 	    int score1, score2;
-	    score1 = scoreStrings(s1_1, s2_1, fh1.blocksize);
-	    score2 = scoreStrings(s1_2, s2_2, fh2.blocksize);
+	    score1 = scoreStrings(s11, s21, fh1.blocksize);
+	    score2 = scoreStrings(s12, s22, fh2.blocksize);
 
 	    score = Math.min(score1, score2);
 	  } else if (fh1.blocksize == fh2.blocksize*2) {
 
-	    score = scoreStrings(s1_1, s2_2, fh1.blocksize);
+	    score = scoreStrings(s11, s22, fh1.blocksize);
 	  } else {
 
-	    score = scoreStrings(s1_2, s2_1, fh2.blocksize);
+	    score = scoreStrings(s12, s21, fh2.blocksize);
 	  }
 	  
 	  return (int)score;
