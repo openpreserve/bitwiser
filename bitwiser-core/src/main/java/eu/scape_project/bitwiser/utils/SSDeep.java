@@ -184,13 +184,13 @@ public class SSDeep {
 
 	static void ssEngine(ss_context ctx, 
 			      byte[] buffer, 
-			      int buffer_size)
+			      int bufferSize)
 	{
 	  if (null == ctx || null == buffer) {
 	    return;
 	  }
 
-	  for ( int i = 0 ; i < buffer_size ; ++i)
+	  for ( int i = 0 ; i < bufferSize ; ++i)
 	  {
 
 	    /* 
@@ -344,7 +344,7 @@ public class SSDeep {
 	}
 
 
-	public FuzzyHash fuzzyHashBuf(byte[] buf, int buf_len)
+	public FuzzyHash fuzzyHashBuf(byte[] buf, int bufLen)
 	{
 	  ss_context ctx = new ss_context();
 	  boolean done = false;
@@ -353,7 +353,7 @@ public class SSDeep {
 	    return null;
 	  }
 
-	  ctx.total_chars = buf_len;
+	  ctx.total_chars = bufLen;
 	  ssInit(ctx, null);
 
 	  while (!done)
@@ -365,7 +365,7 @@ public class SSDeep {
 	    ctx.h  = 0;
 	    rollReset();
 
-	    ssEngine(ctx,buf,buf_len);
+	    ssEngine(ctx,buf,bufLen);
 
 	    /* our blocksize guess may have been way off - repeat if necessary */
 	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) {
@@ -482,7 +482,7 @@ public class SSDeep {
 	  100 is a great match. The block_size is used to cope with very small
 	  messages.
 	*/
-	static int scoreStrings(char[] s1, char[] s2, int block_size)
+	static int scoreStrings(char[] s1, char[] s2, int blockSize)
 	{
 	  int score = 0;
 	  int len1, len2;
@@ -534,8 +534,8 @@ public class SSDeep {
 	  //  printf ("len1: %"PRIu32"  len2: %"PRIu32"\n", len1, len2);
 	  
 	  /* when the blocksize is small we don't want to exaggerate the match size */
-	  if (score > block_size/MIN_BLOCKSIZE * Math.min(len1, len2)) {
-	    score = block_size/MIN_BLOCKSIZE * Math.min(len1, len2);
+	  if (score > blockSize/MIN_BLOCKSIZE * Math.min(len1, len2)) {
+	    score = blockSize/MIN_BLOCKSIZE * Math.min(len1, len2);
 	  }
 	  return score;
 	}
