@@ -162,13 +162,15 @@ public class SSDeep {
 
 	static boolean ssInit(ss_context ctx, File handle)
 	{
-	  if ( ctx == null )
-	    return true;
+	  if ( ctx == null ) {
+		  return true;
+	  }
 
 	  ctx.ret = new FuzzyHash();
 
-	  if (handle != null)
-	    ctx.total_chars = handle.length();
+	  if (handle != null) {
+		  ctx.total_chars = handle.length();
+	  }
 
 	  ctx.block_size = MIN_BLOCKSIZE;
 	  while (ctx.block_size * SPAMSUM_LENGTH < ctx.total_chars) {
@@ -184,8 +186,9 @@ public class SSDeep {
 			      byte[] buffer, 
 			      int buffer_size)
 	{
-	  if (null == ctx || null == buffer)
+	  if (null == ctx || null == buffer) {
 	    return;
+	  }
 
 	  for ( int i = 0 ; i < buffer_size ; ++i)
 	  {
@@ -242,8 +245,9 @@ public class SSDeep {
 	  int bytes_read = 0;
 	  byte[] buffer; 
 
-	  if (null == ctx || null == handle)
+	  if (null == ctx || null == handle) {
 	    return true;
+	  }
 
 	  buffer = new byte[BUFFER_SIZE];
 
@@ -293,8 +297,9 @@ public class SSDeep {
 	  ss_context ctx;  
 	  boolean done = false;
 	  
-	  if (null == handle)
+	  if (null == handle) {
 	    return null;
+	  }
 	  
 	  ctx = new ss_context();
 
@@ -307,10 +312,11 @@ public class SSDeep {
 	    ssUpdate(ctx,handle);
 
 	    // our blocksize guess may have been way off - repeat if necessary
-	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) 
+	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) {
 	      ctx.block_size = ctx.block_size / 2;
-	    else
+	    } else {
 	      done = true;
+	    }
 	  }
 
 	  return ctx.ret;
@@ -325,12 +331,14 @@ public class SSDeep {
 	public FuzzyHash fuzzyHashFilename(String filename) throws IOException
 	{
 		
-	  if (null == filename)
+	  if (null == filename) {
 	    return null;
+	  }
 
 	  File handle = new File(filename);//,"rb");
-	  if (!handle.exists())
+	  if (!handle.exists()) {
 	    return null;
+	  }
 
 	  return fuzzyHashFile(handle);
 	}
@@ -341,8 +349,9 @@ public class SSDeep {
 	  ss_context ctx = new ss_context();
 	  boolean done = false;
 
-	  if (buf == null)
+	  if (buf == null) {
 	    return null;
+	  }
 
 	  ctx.total_chars = buf_len;
 	  ssInit(ctx, null);
@@ -359,16 +368,16 @@ public class SSDeep {
 	    ssEngine(ctx,buf,buf_len);
 
 	    /* our blocksize guess may have been way off - repeat if necessary */
-	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) 
+	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) {
 	      ctx.block_size = ctx.block_size / 2;
-	    else
+	    } else {
 	      done = true;
+	    }
 
-		    if (ctx.h != 0) 
-	      {
-		ctx.p[ctx.j] = b64[(int) ((ctx.h2&0xFFFF) % 64)];
-		ctx.ret2[ctx.k] = b64[(int) ((ctx.h3&0xFFFF) % 64)];
-	      }
+	    if (ctx.h != 0) {
+			ctx.p[ctx.j] = b64[(int) ((ctx.h2&0xFFFF) % 64)];
+			ctx.ret2[ctx.k] = b64[(int) ((ctx.h3&0xFFFF) % 64)];
+	    }
 	    
 	  }
 
@@ -514,7 +523,9 @@ public class SSDeep {
 	  
 	  /* it is possible to get a score above 100 here, but it is a
 	     really terrible match */
-	  if (score >= 100) return 0;
+	  if (score >= 100) {
+		  return 0;
+	  }
 	  
 	  /* now re-scale on a 0-100 scale with 0 being a poor match and
 	     100 being a excellent match. */

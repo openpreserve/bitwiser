@@ -113,8 +113,9 @@ public class BitwiseAnalyser {
        		System.out.println("Completed: "+(100*count/len)+"%");
             flipByteAt(rf,pos);
             result = runCommand(tempFile, outputFile);
-            if( ! result.equals(truth) )
+            if( ! result.equals(truth) ) {
                 System.out.println("Flipped byte "+pos+" : "+result);
+            }
             if( result.equals(truth) ) {
                 clears++;
             }
@@ -189,7 +190,9 @@ public class BitwiseAnalyser {
         executor.shutdown();
         
         if( exists ) {
-            if(exitCode != 0 || stdout.length() > 1 || stderr.length() > 1) return "WARNING:"+exitCode+":"+stdout+"::"+stderr;
+            if(exitCode != 0 || stdout.length() > 1 || stderr.length() > 1) {
+            	return "WARNING:"+exitCode+":"+stdout+"::"+stderr;
+            }
             return "CLEAR";
         } else {
             return "ERROR:"+exitCode+":"+stdout+"::"+stderr;
@@ -208,7 +211,9 @@ public class BitwiseAnalyser {
 			byte[] buf = new byte[1024];
 			int len;
 			while ((len = in.read(buf)) >= 0) {
-				if( len > 0 ) out.write(buf, 0, len);
+				if( len > 0 ) {
+					out.write(buf, 0, len);
+				}
 			}
 			out.flush();
     	} finally {
