@@ -4,6 +4,7 @@
 package eu.scape_project.bitwiser;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -59,20 +60,40 @@ public class BitwiseAnalyser {
         NONE
     }
     
-    private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.7.3-Q16/convert";
-    private static final String DATA_DIR	= "C:/Projects/SCAPE/BitWiser/Data/";
+    private static final String CMD_CONVERT = "C:/Program Files/ImageMagick-6.8.8-Q16/convert";
 
     public static void main(String [] args) throws IOException {
-        File sourceFile = new File(DATA_DIR+"02c440f.tif");		//"/home/anj/Desktop/jp2-tests/32x32-lzw.tif");
-        File tempFile = new File(DATA_DIR+"02c440f.tmp.tif");	//"/home/anj/Desktop/jp2-tests/32x32.tmp.tif");
-        File outputFile = new File(DATA_DIR+"02c440f.jp2");		//"/home/anj/Desktop/jp2-tests/32x32.tmp.jp2");
+    	String inFile   = null;
+    	String tFile    = null;
+    	String outFile  = null;
+    	String ext		= null;
+    	
+    	if (args.length!=2){
+    		ext		= args[0].substring(args[0].lastIndexOf('.'));
+    		inFile  = args[0];
+    		tFile   = inFile.substring(0, inFile.lastIndexOf('.'))+".tmp"+ext;
+    		outFile = inFile.substring(0, inFile.lastIndexOf('.'))+".jp2";
+    		
+    		process(inFile, tFile, outFile);
+    	} else {
+    		System.out.println("Usage: java BitwiseAnalyser <file path>");
+    	}
+    }
+    
+    private static void process(String inFile, String tFile, String outFile) throws IOException {
+    	if(inFile==null || tFile==null || outFile==null ){
+    		return;
+    	}
+    	
+        File sourceFile = new File(inFile);
+        File tempFile = new File(tFile);
+        File outputFile = new File(outFile);
         copy(sourceFile,tempFile);
         
         // Entropy Calc:
         Entropy ent = new Entropy();
         System.out.println("Starting entropy calc...");
         ent.calculate(tempFile, false, false, false, false);
-        //System.exit(0);
         
         // Start munging...
         System.out.println("Start bit-flipping...");
@@ -81,8 +102,6 @@ public class BitwiseAnalyser {
         System.out.println("Truth is "+truth);
         String result = "";
         int clears = 0;
-        int errors = 0;
-        int warnings = 0;
         int count = 0;
         long len = tempFile.length();
         System.out.println("File length: "+len);
@@ -91,8 +110,9 @@ public class BitwiseAnalyser {
        		System.out.println("Completed: "+(100*count/len)+"%");
             flipByteAt(rf,pos);
             result = runCommand(tempFile, outputFile);
-            if( ! result.equals(truth) )
+            if( ! result.equals(truth) ) {
                 System.out.println("Flipped byte "+pos+" : "+result);
+            }
             if( result.equals(truth) ) {
                 clears++;
             }
@@ -126,7 +146,6 @@ public class BitwiseAnalyser {
     }
     
     static String runCommand( File tempFile, File outputFile ) throws IOException {
-//        String[] commands = new String[]{"file", tempFile.getAbsolutePath() };
         outputFile.delete();
         String[] commands = new String[]{CMD_CONVERT, tempFile.getAbsolutePath(), outputFile.getAbsolutePath() };
                 
@@ -136,8 +155,8 @@ public class BitwiseAnalyser {
         Process child = pb.start();
         
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<String> ftr_stdout = executor.submit(new StreamReader(child.getInputStream()));
-        Future<String> ftr_stderr = executor.submit(new StreamReader(child.getErrorStream()));
+        Future<String> ftrStdOut = executor.submit(new StreamReader(child.getInputStream()));
+        Future<String> ftrStdErr = executor.submit(new StreamReader(child.getErrorStream()));
         
         try {
             child.waitFor();
@@ -151,8 +170,8 @@ public class BitwiseAnalyser {
         String stdout = "";
         String stderr = "";
         try {
-			stdout = ftr_stdout.get();
-			stderr = ftr_stderr.get();
+			stdout = ftrStdOut.get();
+			stderr = ftrStdErr.get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -168,7 +187,9 @@ public class BitwiseAnalyser {
         executor.shutdown();
         
         if( exists ) {
-            if(exitCode != 0 || stdout.length() > 1 || stderr.length() > 1) return "WARNING:"+exitCode+":"+stdout+"::"+stderr;
+            if(exitCode != 0 || stdout.length() > 1 || stderr.length() > 1) {
+            	return "WARNING:"+exitCode+":"+stdout+"::"+stderr;
+            }
             return "CLEAR";
         } else {
             return "ERROR:"+exitCode+":"+stdout+"::"+stderr;
@@ -176,17 +197,37 @@ public class BitwiseAnalyser {
     }
     
     static void copy(File src, File dst) throws IOException {
-     InputStream in = new FileInputStream(src);
-     OutputStream out = new FileOutputStream(dst);
-
-     // Transfer bytes from in to out
-     byte[] buf = new byte[1024];
-     int len;
-     while ((len = in.read(buf)) >= 0) {
-         if( len > 0 ) out.write(buf, 0, len);
+    	InputStream in = null;
+    	OutputStream out = null;
+    	
+    	try{
+    		in = new FileInputStream(src);
+    		out = new FileOutputStream(dst);
+    	
+			// Transfer bytes from in to out
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) >= 0) {
+				if( len > 0 ) {
+					out.write(buf, 0, len);
+				}
+			}
+			out.flush();
+    	} finally {
+    		close(in);
+    		close(out);
+    	}
+	}
+    
+    private static void close(Closeable c) {
+        if (c==null) {
+        	return; 
+        }
+        
+        try {
+            c.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
      }
-     in.close();
-     out.flush();
-     out.close();
-    }
 }

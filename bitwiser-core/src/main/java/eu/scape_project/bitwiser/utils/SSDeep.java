@@ -85,7 +85,7 @@ public class SSDeep {
 	  int h1, h2, h3;
 	  int n;
 	}
-	private static roll_state_class roll_state = new roll_state_class();
+	private static roll_state_class rollState = new roll_state_class();
 
 
 	/*
@@ -98,58 +98,54 @@ public class SSDeep {
 	  h3 is a shift/xor based rolling hash, and is mostly needed to ensure that
 	  we can cope with large blocksize values
 	*/
-	static int roll_hash(int c)
+	static int rollHash(int c)
 	{
 		
-//		System.out.println(""+roll_state.h1+","+roll_state.h2+","+roll_state.h3);
-	  roll_state.h2 -= roll_state.h1;
-	  //roll_state.h2 = roll_state.h2 & 0x7fffffff;
-	  roll_state.h2 += ROLLING_WINDOW * c;
-	  //roll_state.h2 = roll_state.h2 & 0x7fffffff;
+	  rollState.h2 -= rollState.h1;
+	  //roll_state.h2 = roll_state.h2 & 0x7fffffff
+	  rollState.h2 += ROLLING_WINDOW * c;
+	  //roll_state.h2 = roll_state.h2 & 0x7fffffff
 	  
-	  roll_state.h1 += c;
-	  //roll_state.h1 = roll_state.h1 & 0x7fffffff;
-	  roll_state.h1 -= roll_state.window[(roll_state.n % ROLLING_WINDOW)];
-	  //roll_state.h1 = roll_state.h1 & 0x7fffffff;
+	  rollState.h1 += c;
+	  //roll_state.h1 = roll_state.h1 & 0x7fffffff
+	  rollState.h1 -= rollState.window[(rollState.n % ROLLING_WINDOW)];
+	  //roll_state.h1 = roll_state.h1 & 0x7fffffff
 	  
-	  roll_state.window[roll_state.n % ROLLING_WINDOW] = (char)c;
-	  roll_state.n = (roll_state.n+1)%ROLLING_WINDOW;
+	  rollState.window[rollState.n % ROLLING_WINDOW] = (char)c;
+	  rollState.n = (rollState.n+1)%ROLLING_WINDOW;
 	  
 	  /* The original spamsum AND'ed this value with 0xFFFFFFFF which
 	     in theory should have no effect. This AND has been removed 
 	     for performance (jk) */
-	  roll_state.h3 = (roll_state.h3 << 5);// & 0xFFFFFFFF;
-	  roll_state.h3 ^= c;
-	  //roll_state.h3 = roll_state.h3 & 0x7FFFFFFF;
-	  //if( roll_state.h3 > 0xEFFFFFFF ) roll_state.h3 -= 0xEFFFFFFF;
+	  rollState.h3 = (rollState.h3 << 5);
+	  rollState.h3 ^= c;
+	  //roll_state.h3 = roll_state.h3 & 0x7FFFFFFF
+	  //if( roll_state.h3 > 0xEFFFFFFF ) roll_state.h3 -= 0xEFFFFFFF
 	  
-	  long result = ((roll_state.h1 + roll_state.h2 + roll_state.h3));//&0x7FFFFFFF;
-	  //System.out.println("Result: "+result);
-	  //System.out.println("Result2: "+(result&0xFFFFFFFF));
-	  //System.out.println("Result3: "+(result&0x7FFFFFFF));
+	  long result = ((rollState.h1 + rollState.h2 + rollState.h3));//&0x7FFFFFFF
 	  
-	  return (int) result;//&0xFFFFFFFF;
+	  return (int) result;
 	}
 
 	/*
 	  reset the state of the rolling hash and return the initial rolling hash value
 	*/
-	static void roll_reset()
+	static void rollReset()
 	{	
-		  roll_state.h1 = 0;
-		  roll_state.h2 = 0;
-		  roll_state.h3 = 0;
-		  roll_state.n = 0;
-		  Arrays.fill(roll_state.window,(char)0);
+		  rollState.h1 = 0;
+		  rollState.h2 = 0;
+		  rollState.h3 = 0;
+		  rollState.n = 0;
+		  Arrays.fill(rollState.window,(char)0);
 	}
 
 	/* a simple non-rolling hash, based on the FNV hash */
-	static int sum_hash(int c, int h)
+	static int sumHash(int c, int h)
 	{
 	  h *= HASH_PRIME;
-	  //h = h & 0xFFFFFFFF;
+	  //h = h & 0xFFFFFFFF
 	  h ^= c;
-	  //h = h & 0xFFFFFFFF;
+	  //h = h & 0xFFFFFFFF
 	  return h;
 	}
 
@@ -164,36 +160,37 @@ public class SSDeep {
 	}
 
 
-	static boolean ss_init(ss_context ctx, File handle)
+	static boolean ssInit(ss_context ctx, File handle)
 	{
-	  if ( ctx == null )
-	    return true;
+	  if ( ctx == null ) {
+		  return true;
+	  }
 
 	  ctx.ret = new FuzzyHash();
 
-	  if (handle != null)
-	    ctx.total_chars = handle.length();
+	  if (handle != null) {
+		  ctx.total_chars = handle.length();
+	  }
 
 	  ctx.block_size = MIN_BLOCKSIZE;
 	  while (ctx.block_size * SPAMSUM_LENGTH < ctx.total_chars) {
 	    ctx.block_size = ctx.block_size * 2;
 	  }
-	  
-	  //System.out.println("bs:"+ctx.block_size);
 
 	  return false;
 	}
 
 	static char[] b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".toCharArray();
 
-	static void ss_engine(ss_context ctx, 
+	static void ssEngine(ss_context ctx, 
 			      byte[] buffer, 
-			      int buffer_size)
+			      int bufferSize)
 	{
-	  if (null == ctx || null == buffer)
+	  if (null == ctx || null == buffer) {
 	    return;
+	  }
 
-	  for ( int i = 0 ; i < buffer_size ; ++i)
+	  for ( int i = 0 ; i < bufferSize ; ++i)
 	  {
 
 	    /* 
@@ -203,10 +200,9 @@ public class SSDeep {
 	       element of the signature and reset both hashes
 	    */
 		  
-	    //System.out.println(""+ctx.h+","+ctx.h2+","+ctx.h3);
-	    ctx.h  = roll_hash(buffer[i]);// & 0x7FFFFFFF;
-	    ctx.h2 = sum_hash(buffer[i], ctx.h2);// & 0x7FFFFFFF;
-	    ctx.h3 = sum_hash(buffer[i], ctx.h3);// & 0x7FFFFFFF;
+	    ctx.h  = rollHash(buffer[i]);// & 0x7FFFFFFF;
+	    ctx.h2 = sumHash(buffer[i], ctx.h2);// & 0x7FFFFFFF;
+	    ctx.h3 = sumHash(buffer[i], ctx.h3);// & 0x7FFFFFFF;
 	    
 	    if (((0xFFFFFFFFl & ctx.h) % ctx.block_size) == (ctx.block_size-1)) {
 	      /* we have hit a reset point. We now emit a
@@ -214,11 +210,7 @@ public class SSDeep {
 		 piece of the message between the last reset
 		 point and this one */
 	      ctx.p[ctx.j] = b64[(int)((ctx.h2&0xFFFF) % 64)];
-	      //System.out.println("::"+ctx.j+":"+new String(ctx.p));
-//	      for( char c : ctx.p ) {
-//	    	  System.out.print(c);
-//	      }
-//    	  System.out.println();	      
+	      
 	      if (ctx.j < SPAMSUM_LENGTH-1) {
 		/* we can have a problem with the tail
 		   overflowing. The easiest way to
@@ -248,38 +240,37 @@ public class SSDeep {
 	  }
 	}
 
-	static boolean ss_update(ss_context ctx, File handle) throws IOException
+	static boolean ssUpdate(ss_context ctx, File handle) throws IOException
 	{
-	  int bytes_read = 0;
+	  int bytesRead = 0;
 	  byte[] buffer; 
 
-	  if (null == ctx || null == handle)
+	  if (null == ctx || null == handle) {
 	    return true;
+	  }
 
 	  buffer = new byte[BUFFER_SIZE];
 
-	  // snprintf(ctx.ret, 12, "%u:", ctx.block_size);
 	  ctx.ret.blocksize = ctx.block_size;
-	  // ctx.p = ctx.ret + strlen(ctx.ret);  
+	  // ctx.p = ctx.ret + strlen(ctx.ret)  
 	  ctx.p = new char[SPAMSUM_LENGTH];
 	  
-	  //memset(ctx.p, 0, SPAMSUM_LENGTH+1);
+	  //memset(ctx.p, 0, SPAMSUM_LENGTH+1)
 	  Arrays.fill(ctx.p, (char)0 );
-	  //memset(ctx.ret2, 0, sizeof(ctx.ret2.length));
+	  //memset(ctx.ret2, 0, sizeof(ctx.ret2.length))
 	  Arrays.fill(ctx.ret2, (char)0 );
 	  
 	  ctx.k  = ctx.j  = 0;
 	  ctx.h3 = ctx.h2 = HASH_INIT;
 	  ctx.h  = 0;
-	  roll_reset();
+	  rollReset();
 
-	  //System.out.println("Opening file:"+handle);
 	  FileInputStream in = new FileInputStream(handle);
 	  // while ((bytes_read = fread(buffer,sizeof(byte),BUFFER_SIZE,handle)) > 0)
 	  while (in.available() > 0 )
 	  {
-		  bytes_read = in.read(buffer);
-	      ss_engine(ctx,buffer,bytes_read);
+		  bytesRead = in.read(buffer);
+	      ssEngine(ctx,buffer,bytesRead);
 	  }
 	  in.close();
 
@@ -301,40 +292,32 @@ public class SSDeep {
 	 * @return
 	 * @throws IOException
 	 */
-	public FuzzyHash fuzzy_hash_file(File handle) throws IOException
+	public FuzzyHash fuzzyHashFile(File handle) throws IOException
 	{
 	  ss_context ctx;  
 	  boolean done = false;
 	  
-	  if (null == handle)
+	  if (null == handle) {
 	    return null;
+	  }
 	  
 	  ctx = new ss_context();
 
-	  ss_init(ctx, handle);
+	  ssInit(ctx, handle);
 	  
 	  ctx.ret.filename = handle.getPath();
 
 	  while (!done)
 	  {
-		//  if (fseeko(handle,0,SEEK_SET))
-		//    return true;
-
-	    ss_update(ctx,handle);
-	    
-		//System.out.println("RESULT:"+ctx.ret);
+	    ssUpdate(ctx,handle);
 
 	    // our blocksize guess may have been way off - repeat if necessary
-	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) 
+	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) {
 	      ctx.block_size = ctx.block_size / 2;
-	    else
+	    } else {
 	      done = true;
+	    }
 	  }
-
-	  //System.out.println("bs-post:"+ctx.block_size);
-	// strncpy(result,ctx.ret,FUZZY_MAX_RESULT);
-	  
-	  //System.out.println("RESULT:"+ctx.ret);
 
 	  return ctx.ret;
 	}
@@ -345,57 +328,56 @@ public class SSDeep {
 	 * @return
 	 * @throws IOException
 	 */
-	public FuzzyHash fuzzy_hash_filename(String filename) throws IOException
+	public FuzzyHash fuzzyHashFilename(String filename) throws IOException
 	{
 		
-	  if (null == filename)
+	  if (null == filename) {
 	    return null;
+	  }
 
 	  File handle = new File(filename);//,"rb");
-	  if (!handle.exists())
+	  if (!handle.exists()) {
 	    return null;
+	  }
 
-	  return fuzzy_hash_file(handle);
+	  return fuzzyHashFile(handle);
 	}
 
 
-	public FuzzyHash fuzzy_hash_buf(byte[] buf, int buf_len)
+	public FuzzyHash fuzzyHashBuf(byte[] buf, int bufLen)
 	{
 	  ss_context ctx = new ss_context();
 	  boolean done = false;
 
-	  if (buf == null)
+	  if (buf == null) {
 	    return null;
+	  }
 
-	  ctx.total_chars = buf_len;
-	  ss_init(ctx, null);
-
-	  //System.out.println("total_chars: "+ctx.total_chars);
+	  ctx.total_chars = bufLen;
+	  ssInit(ctx, null);
 
 	  while (!done)
 	  {
-		//  snprintf(ctx.ret, 12, "%u:", ctx.block_size);
-		//  ctx.p = ctx.ret + strlen(ctx.ret);
 		  ctx.p = new char[SPAMSUM_LENGTH+1]; // TODO Duplication!
 	    
 	    ctx.k  = ctx.j  = 0;
 	    ctx.h3 = ctx.h2 = HASH_INIT;
 	    ctx.h  = 0;
-	    roll_reset();
+	    rollReset();
 
-	    ss_engine(ctx,buf,buf_len);
+	    ssEngine(ctx,buf,bufLen);
 
 	    /* our blocksize guess may have been way off - repeat if necessary */
-	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) 
+	    if (ctx.block_size > MIN_BLOCKSIZE && ctx.j < SPAMSUM_LENGTH/2) {
 	      ctx.block_size = ctx.block_size / 2;
-	    else
+	    } else {
 	      done = true;
+	    }
 
-		    if (ctx.h != 0) 
-	      {
-		ctx.p[ctx.j] = b64[(int) ((ctx.h2&0xFFFF) % 64)];
-		ctx.ret2[ctx.k] = b64[(int) ((ctx.h3&0xFFFF) % 64)];
-	      }
+	    if (ctx.h != 0) {
+			ctx.p[ctx.j] = b64[(int) ((ctx.h2&0xFFFF) % 64)];
+			ctx.ret2[ctx.k] = b64[(int) ((ctx.h3&0xFFFF) % 64)];
+	    }
 	    
 	  }
 
@@ -410,8 +392,8 @@ public class SSDeep {
 	 * @param buf
 	 * @return
 	 */
-	public FuzzyHash fuzzy_hash_buf(byte[] buf) {
-		return this.fuzzy_hash_buf(buf, buf.length);
+	public FuzzyHash fuzzyHashBuf(byte[] buf) {
+		return this.fuzzyHashBuf(buf, buf.length);
 	}
 
 	/* 
@@ -422,43 +404,40 @@ public class SSDeep {
 
 	   return 1 if the two strings do have a common substring, 0 otherwise
 	*/
-	static int has_common_substring(char[] s1, char[] s2)
+	static int hasCommonSubstring(char[] s1, char[] s2)
 	{
-	  int i, j;
-	  int num_hashes;
+	  int i;
 	  long[] hashes = new long[SPAMSUM_LENGTH];
 	  
 	  /* there are many possible algorithms for common substring
 	     detection. In this case I am re-using the rolling hash code
 	     to act as a filter for possible substring matches */
 	  
-	  roll_reset();
-	//  memset(hashes, 0, sizeof(hashes));
+	  rollReset();
 	  
 	  /* first compute the windowed rolling hash at each offset in
 	     the first string */
 	  for (i=0;i < s1.length;i++) 
 	  {
-	    hashes[i] = roll_hash((char)s1[i]);
+	    hashes[i] = rollHash((char)s1[i]);
 	  }
-	  num_hashes = i;
 	  
-	  roll_reset();
+	  rollReset();
 	  
 	  /* now for each offset in the second string compute the
 	     rolling hash and compare it to all of the rolling hashes
 	     for the first string. If one matches then we have a
 	     candidate substring match. We then confirm that match with
 	     a direct string comparison */
-	  for (i=0;i < s2.length;i++) {
+	  /*for (i=0;i < s2.length;i++) {
 	    long h = roll_hash((char)s2[i]);
 	    if (i < ROLLING_WINDOW-1) continue;
 	    for (j=ROLLING_WINDOW-1;j<num_hashes;j++) 
 	    {
 	      if (hashes[j] != 0 && hashes[j] == h) 
 	      {
-		/* we have a potential match - confirm it */
-	    	  /*FIXME
+		// we have a potential match - confirm it
+	   	//FIXME
 		if (strlen(s2+i-(ROLLING_WINDOW-1)) >= ROLLING_WINDOW && 
 		    strncmp(s2+i-(ROLLING_WINDOW-1), 
 			    s1+j-(ROLLING_WINDOW-1), 
@@ -466,10 +445,10 @@ public class SSDeep {
 		{
 		  return 1;
 		}
-		*/
+		
 	      }
 	    }
-	  }
+	  }*/
 	  
 	  return 0;
 	}
@@ -478,7 +457,7 @@ public class SSDeep {
 	// eliminate sequences of longer than 3 identical characters. These
 	// sequences contain very little information so they tend to just bias
 	// the result unfairly
-	static char[] eliminate_sequences(String string)
+	static char[] eliminateSequences(String string)
 	{
 		char[] str = string.toCharArray();
 	  StringBuffer ret = new StringBuffer();
@@ -501,7 +480,7 @@ public class SSDeep {
 	  100 is a great match. The block_size is used to cope with very small
 	  messages.
 	*/
-	static int score_strings(char[] s1, char[] s2, int block_size)
+	static int scoreStrings(char[] s1, char[] s2, int blockSize)
 	{
 	  int score = 0;
 	  int len1, len2;
@@ -542,7 +521,9 @@ public class SSDeep {
 	  
 	  /* it is possible to get a score above 100 here, but it is a
 	     really terrible match */
-	  if (score >= 100) return 0;
+	  if (score >= 100) {
+		  return 0;
+	  }
 	  
 	  /* now re-scale on a 0-100 scale with 0 being a poor match and
 	     100 being a excellent match. */
@@ -551,8 +532,8 @@ public class SSDeep {
 	  //  printf ("len1: %"PRIu32"  len2: %"PRIu32"\n", len1, len2);
 	  
 	  /* when the blocksize is small we don't want to exaggerate the match size */
-	  if (score > block_size/MIN_BLOCKSIZE * Math.min(len1, len2)) {
-	    score = block_size/MIN_BLOCKSIZE * Math.min(len1, len2);
+	  if (score > blockSize/MIN_BLOCKSIZE * Math.min(len1, len2)) {
+	    score = blockSize/MIN_BLOCKSIZE * Math.min(len1, len2);
 	  }
 	  return score;
 	}
@@ -560,11 +541,11 @@ public class SSDeep {
 	/*
 	  given two spamsum strings return a value indicating the degree to which they match.
 	*/
-	int fuzzy_compare(FuzzyHash fh1, FuzzyHash fh2 )
+	int fuzzyCompare(FuzzyHash fh1, FuzzyHash fh2 )
 	{
 	  int score = 0;
-	  char[] s1_1, s1_2;
-	  char[] s2_1, s2_2;
+	  char[] s11, s12;
+	  char[] s21, s22;
 	  
 	  // if the blocksizes don't match then we are comparing
 	  // apples to oranges. This isn't an 'error' per se. We could
@@ -579,31 +560,27 @@ public class SSDeep {
 	  // the same character like 'LLLLL'. Eliminate any sequences
 	  // longer than 3. This is especially important when combined
 	  // with the has_common_substring() test below. 
-	  s1_1 = eliminate_sequences(fh1.hash);
-	  s2_1 = eliminate_sequences(fh2.hash);
+	  s11 = eliminateSequences(fh1.hash);
+	  s21 = eliminateSequences(fh2.hash);
 	  
-	  s1_2 = eliminate_sequences(fh1.hash2);
-	  s2_2 = eliminate_sequences(fh1.hash2);
+	  s12 = eliminateSequences(fh1.hash2);
+	  s22 = eliminateSequences(fh1.hash2);
 	  
 	  // each signature has a string for two block sizes. We now
 	  // choose how to combine the two block sizes. We checked above
 	  // that they have at least one block size in common 
 	  if (fh1.blocksize == fh2.blocksize) {
 	    int score1, score2;
-	    score1 = score_strings(s1_1, s2_1, fh1.blocksize);
-	    score2 = score_strings(s1_2, s2_2, fh2.blocksize);
-	    
-	    //s.block_size = fh1.blocksize;
+	    score1 = scoreStrings(s11, s21, fh1.blocksize);
+	    score2 = scoreStrings(s12, s22, fh2.blocksize);
 
 	    score = Math.min(score1, score2);
 	  } else if (fh1.blocksize == fh2.blocksize*2) {
 
-	    score = score_strings(s1_1, s2_2, fh1.blocksize);
-	    //    s.block_size = fh1.blocksize;
+	    score = scoreStrings(s11, s22, fh1.blocksize);
 	  } else {
 
-	    score = score_strings(s1_2, s2_1, fh2.blocksize);
-	    //    s.block_size = fh2.blocksize;
+	    score = scoreStrings(s12, s21, fh2.blocksize);
 	  }
 	  
 	  return (int)score;

@@ -27,19 +27,22 @@ public class SimHash<T> {
 	public static <T> SimHash<T> build(List<T> dimensions){
 		Hashing<T> hashing = new Hashing<T>(){
 			public BitSet hashing(T t) {
+				BitSet ret = null;
+				
 				String key = t.toString();
 				byte[] bytes = null;
 				try {
 					MessageDigest md = MessageDigest.getInstance("MD5");
 					bytes = md.digest(key.getBytes());
+					
+					ret = new BitSet(bytes.length*8);
+					for(int k=0; k<bytes.length*8; k++){
+						if(bitTest(bytes,k)) {
+							ret.set(k);
+						}
+					}
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
-				}
-
-				BitSet ret = new BitSet(bytes.length*8);
-				for(int k=0; k<bytes.length*8; k++){
-					if(bitTest(bytes,k))
-						ret.set(k);
 				}
 
 				return ret;
@@ -88,8 +91,9 @@ public class SimHash<T> {
 		//convert feature to bits
 		BitSet ret = new BitSet(feature.length);
 		for(int k=0; k<feature.length; k++){
-			if(feature[k]>0)
+			if(feature[k]>0) {
 				ret.set(k);
+			}
 		}
 
 		return ret;

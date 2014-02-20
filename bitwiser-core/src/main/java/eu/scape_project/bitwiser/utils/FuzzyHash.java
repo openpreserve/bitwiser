@@ -13,8 +13,8 @@ public class FuzzyHash {
 	protected FuzzyHash() {
 	}
 
-	protected FuzzyHash(int block_size, String string, String string2) {
-		this.blocksize = block_size;
+	protected FuzzyHash(int blockSize, String string, String string2) {
+		this.blocksize = blockSize;
 		this.hash = string;
 		this.hash2 = string2;
 		this.clean();
