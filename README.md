@@ -27,8 +27,8 @@ The Java codebase contains an older version of the bitwise analysis tools, but t
 
 Ideas
 -----
-* http://stackoverflow.com/questions/492751/tools-to-help-reverse-engineer-binary-file-formats
-* tupni-ccs08.pdf
+* [Tools to help reverse engineer binary file formats](http://stackoverflow.com/questions/492751/tools-to-help-reverse-engineer-binary-file-formats)
+* [Tupni: Automatic Reverse Engineering of Input Formats](http://research.microsoft.com/en-us/um/people/wdcui/papers/tupni-ccs08.pdf)
 * Follow up on http://www.openplanetsfoundation.org/comment/428#comment-428
 
 Branches
