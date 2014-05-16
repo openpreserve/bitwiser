@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     testfile = args.file
     outfile = args.out
-    tmp_file = "tmp-flipped-"+testfile
+    tmp_file = "tmp-flipped-"+os.path.basename(testfile)
 
     # create a temporary file for bit manipulation
     shutil.copyfile(testfile, tmp_file)
