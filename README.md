@@ -15,7 +15,7 @@ The best and most recent version of the main tools for bitwise analysis are writ
 More information about these tools, and about the kind of results that can be generated using them, see:
 
  * [Understanding Tools & Formats Via Bitwise Analysis](http://anjackson.github.io/keeping-codes/experiments/Understanding%20Tools%20and%20Formats%20Via%20Bitwise%20Analysis.html)
- * [Improvements to Jpylyzer based on that analysis.](https://github.com/openplanets/jpylyzer/issues/31)
+ * [Improvements to Jpylyzer based on that analysis.](https://github.com/openpreserve/jpylyzer/issues/31)
 
 
 ### Java Tools ###
@@ -30,6 +30,7 @@ Ideas
 * [Tools to help reverse engineer binary file formats](http://stackoverflow.com/questions/492751/tools-to-help-reverse-engineer-binary-file-formats)
 * [Tupni: Automatic Reverse Engineering of Input Formats](http://research.microsoft.com/en-us/um/people/wdcui/papers/tupni-ccs08.pdf)
 * Follow up on http://www.openplanetsfoundation.org/comment/428#comment-428
+* Merge in [the shotgun](https://github.com/mcarden/shotgun) approach, and make a UI/web tool?
 
 Branches
 --------
