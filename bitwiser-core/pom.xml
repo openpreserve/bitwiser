@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.scape-project.bitwiser</groupId>
 	<artifactId>bitwiser</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Bitwiser</name>
 	<description>Bitwise analysis tools.</description>
 	<url>https://github.com/openplanets/bitwiser</url>
@@ -41,6 +41,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.6</jdk.version>
+        <additionalparam>-Xdoclint:none</additionalparam>
 	</properties>
 	<build>
 		<resources>
