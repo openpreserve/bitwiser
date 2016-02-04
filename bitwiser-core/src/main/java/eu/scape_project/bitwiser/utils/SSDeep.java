@@ -541,7 +541,7 @@ public class SSDeep {
 	/*
 	  given two spamsum strings return a value indicating the degree to which they match.
 	*/
-	int fuzzyCompare(FuzzyHash fh1, FuzzyHash fh2 )
+    static int fuzzyCompare(FuzzyHash fh1, FuzzyHash fh2)
 	{
 	  int score = 0;
 	  char[] s11, s12;

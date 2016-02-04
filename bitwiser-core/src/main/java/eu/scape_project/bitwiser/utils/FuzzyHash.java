@@ -1,5 +1,7 @@
 package eu.scape_project.bitwiser.utils;
 
+import org.apache.commons.lang.StringUtils;
+
 public class FuzzyHash { 
 	/** the blocksize used by the program, */
 	protected int blocksize;
@@ -69,4 +71,47 @@ public class FuzzyHash {
 		return str;
 	}
 	
+    /**
+     * 
+     * @param fhs
+     * @return
+     */
+    public static FuzzyHash fromString(String fhs) {
+        if (StringUtils.isBlank(fhs))
+            return null;
+        String[] parts = fhs.split("[:,]+", 4);
+        if (parts.length != 3 && parts.length != 4)
+            return null;
+        FuzzyHash fh = new FuzzyHash(Integer.parseInt(parts[0]), parts[1],
+                parts[2]);
+        if (parts.length == 4)
+            fh.filename = parts[3].replaceAll("^\"", "").replaceAll("\"$", "");
+        return fh;
+    }
+
+    /**
+     * 
+     * @param h
+     * @param h2
+     * @return
+     */
+    public static int compare(FuzzyHash h, FuzzyHash h2) {
+        return SSDeep.fuzzyCompare(h, h2);
+    }
+
+    /**
+     * 
+     * @param h1
+     * @param h2
+     * @return
+     */
+    public static int compare(String h1, String h2) {
+        FuzzyHash fh1 = FuzzyHash.fromString(h1);
+        FuzzyHash fh2 = FuzzyHash.fromString(h2);
+        if (fh1 == null || fh2 == null) {
+            return 0;
+        }
+        return FuzzyHash.compare(fh1, fh2);
+    }
+
 }
