@@ -564,7 +564,7 @@ public class SSDeep {
 	  s21 = eliminateSequences(fh2.hash);
 	  
 	  s12 = eliminateSequences(fh1.hash2);
-	  s22 = eliminateSequences(fh1.hash2);
+	  s22 = eliminateSequences(fh2.hash2);
 	  
 	  // each signature has a string for two block sizes. We now
 	  // choose how to combine the two block sizes. We checked above
