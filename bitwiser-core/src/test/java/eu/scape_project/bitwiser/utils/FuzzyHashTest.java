@@ -23,7 +23,7 @@ public class FuzzyHashTest {
         System.out.println("FH2: " + fh2.toString());
         int comparison = FuzzyHash.compare(fh1, fh2);
         System.out.println("Comparison = " + comparison);
-        assertEquals("Wrong comparisong result!", 97, comparison);
+        assertEquals("Wrong comparisong result!", 94, comparison);
     }
 
     @Test
@@ -36,6 +36,6 @@ public class FuzzyHashTest {
         System.out.println("FH2: " + fh2.toString());
         int comparison = FuzzyHash.compare(fh1, fh2);
         System.out.println("Comparison = " + comparison);
-        assertEquals("Wrong comparisong result!", 97, comparison);
+        assertEquals("Wrong comparisong result!", 94, comparison);
     }
 }
